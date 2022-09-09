@@ -148,37 +148,22 @@ void generateMachineCode()
             std::bitset<REGISTER_INSTRUCTION_SIZE> register_bitset((int)register_number_character);
             register_array.push_back(register_bitset);
         }
+
+        // write the to the file
+        machine_code_file << opcode;
+
+        for (std::vector<std::bitset<REGISTER_INSTRUCTION_SIZE>>::iterator i = register_array.begin() ; i != register_array.end(); ++i)
+        {
+            std::bitset<REGISTER_INSTRUCTION_SIZE> register_index = *i;
+            machine_code_file << register_index;
+        }
+
+        register_array.clear();
+
+        machine_code_file << endl;
     }
 
     // TODO: branch between different types
-
-    // write the to the file
-    machine_code_file << opcode;
-
-    for (std::vector<std::bitset<REGISTER_INSTRUCTION_SIZE>>::iterator i = register_array.begin() ; i != register_array.end(); ++i)
-    {
-        std::bitset<REGISTER_INSTRUCTION_SIZE> register_index = *i;
-        machine_code_file << register_index;
-    }
-
-    // machine_code_file << endl;
-
-    // std::string s = "scott>=tiger>=mushroom";
-    // std::string delimiter = ">=";
-
-    // size_t delim_position = 0;
-    // std::string token;
-    // while ((delim_position = s.find(delimiter)) != std::string::npos) {
-    //     token = s.substr(0, delim_position);
-    //     std::cout << token << std::endl;
-    //     s.erase(0, delim_position + delimiter.length());
-    // }
-    // std::cout << s << std::endl;
-
-    // Output:
-    // scott
-    // tiger
-    // mushroom
 }
 
 std::bitset<OPCODE_SIZE> generateOpcode(std::string opcode)
