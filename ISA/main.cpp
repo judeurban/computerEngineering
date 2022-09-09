@@ -111,11 +111,14 @@ void generateMachineCode()
     size_t delim_position = 0;
     
     std::string opcode_string;
-    // uint8_t opcode;
     std::bitset<OPCODE_SIZE> opcode;
+    std::vector<std::bitset<REGISTER_INSTRUCTION_SIZE>> register_array;             // vector of register addresses, may be one or multiple.
+    // std::bitset<REGISTER_INSTRUCTION_SIZE> register;
+    char register_number_character;
 
-    // io::BinaryWriter binarystream = new IO::BinaryWriter(file);
-    // TODO: write binary file. For now, just write machine code.
+    std::string machine_code_instruction;
+
+    // TODO: write binary file. For now, just write machine code using ascii.
 
     // iterate through the list of instructions
     // output the machine-code instruction for each
@@ -123,25 +126,42 @@ void generateMachineCode()
 
     if(!machine_code_file.is_open()) { return; }
 
+    // iterate through the list of instructions
     for (std::vector<std::string>::iterator it = allInstructions.begin() ; it != allInstructions.end(); ++it)
     {
+        // find the instruction string
         instr_string = *it;
 
+        // get the delimeter position of the first parenthesis
         delim_position = instr_string.find(OPEN_INSTRUCTION_DELIMITER);
         if(delim_position == std::string::npos) { return; }
 
         opcode_string = instr_string.substr(0, delim_position).c_str();
         opcode = generateOpcode(opcode_string);
-        machine_code_file << opcode << endl;
-        
         instr_string.erase(0, delim_position + sizeof(OPEN_INSTRUCTION_DELIMITER));
 
-        while ( (delim_position = instr_string.find(OPEN_INSTRUCTION_DELIMITER)) != std::string::npos)
+        // find 'r'
+        while ( (delim_position = instr_string.find(REGISTER_IDENTIFIER)) != std::string::npos)
         {
-            break;
+            register_number_character = *instr_string.substr(delim_position + 1).c_str();
+            instr_string.erase(0, delim_position + sizeof(OPEN_INSTRUCTION_DELIMITER));
+            std::bitset<REGISTER_INSTRUCTION_SIZE> register_bitset((int)register_number_character);
+            register_array.push_back(register_bitset);
         }
-
     }
+
+    // TODO: branch between different types
+
+    // write the to the file
+    machine_code_file << opcode;
+
+    for (std::vector<std::bitset<REGISTER_INSTRUCTION_SIZE>>::iterator i = register_array.begin() ; i != register_array.end(); ++i)
+    {
+        std::bitset<REGISTER_INSTRUCTION_SIZE> register_index = *i;
+        machine_code_file << register_index;
+    }
+
+    // machine_code_file << endl;
 
     // std::string s = "scott>=tiger>=mushroom";
     // std::string delimiter = ">=";
@@ -211,7 +231,7 @@ std::bitset<OPCODE_SIZE> generateOpcode(std::string opcode)
     else if(opcode == EGG_S){
         return EGG_V;
     }
-    
+
     return 0;
 }
 

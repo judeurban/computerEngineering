@@ -10,6 +10,7 @@
 #define NUMBER_OF_REGISTERS 8       //
 #define MAXIMUM_INSTRUCTIONS 10     //
 #define OPCODE_SIZE 4               // bits
+#define REGISTER_INSTRUCTION_SIZE 4               // bits
 
 // REGISTERS
 uint32_t allRegisters[NUMBER_OF_REGISTERS];
@@ -69,7 +70,7 @@ uint32_t* zero_register = &allRegisters[0];
 #define STORE_S "store"
 #define STORE_V 0xE
 
-// easter egg
+// easter
 #define EGG_S "egg"
 #define EGG_V 0xF
 
@@ -88,6 +89,7 @@ const uint8_t invalidCharacterLen = sizeof(invalidCharacters)/sizeof(invalidChar
 
 #define OPEN_INSTRUCTION_DELIMITER '('
 #define CLOSE_INSTRUCTION_DELIMITER '('
+#define REGISTER_IDENTIFIER 'r'
 #define REGISTER_DELIMTER ','
 
 void generateMachineCode(void);
