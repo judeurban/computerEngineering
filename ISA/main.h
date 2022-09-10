@@ -88,11 +88,11 @@ const char invalidCharacters[] = {'\n', ' '};
 const uint8_t invalidCharacterLen = sizeof(invalidCharacters)/sizeof(invalidCharacters[0]);
 
 #define OPEN_INSTRUCTION_DELIMITER '('
-#define CLOSE_INSTRUCTION_DELIMITER '('
+#define CLOSE_INSTRUCTION_DELIMITER ')'
 #define REGISTER_IDENTIFIER 'r'
 #define REGISTER_DELIMTER ','
 
 void generateMachineCode(void);
-std::bitset<OPCODE_SIZE> generateOpcode(std::string);
+uint8_t generateOpcode(std::string);
 
 #endif

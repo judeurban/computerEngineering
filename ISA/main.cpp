@@ -106,67 +106,58 @@ void printInstructions()
 void generateMachineCode()
 {
     std::ofstream machine_code_file("machine_code_file.txt");
+    size_t delimter_position;
+    size_t register_delimter_position;
 
-    std::string instr_string;
-    size_t delim_position = 0;
-    
-    std::string opcode_string;
-    std::bitset<OPCODE_SIZE> opcode;
-    std::vector<std::bitset<REGISTER_INSTRUCTION_SIZE>> register_array;             // vector of register addresses, may be one or multiple.
-    // std::bitset<REGISTER_INSTRUCTION_SIZE> register;
-    char register_number_character;
+    std::string instruction_string;
+    std::string sub_str;
+    // std::string register_str;
 
-    std::string machine_code_instruction;
-
-    // TODO: write binary file. For now, just write machine code using ascii.
-
-    // iterate through the list of instructions
-    // output the machine-code instruction for each
-    // start with just the op-code, since that's all we have.
+    uint8_t opcode_byte;
+    uint8_t register_byte;
 
     if(!machine_code_file.is_open()) { return; }
 
-    // iterate through the list of instructions
+    // TODO: left shift by 4, then AND with the register to create represent each with four bits?
+
     for (std::vector<std::string>::iterator it = allInstructions.begin() ; it != allInstructions.end(); ++it)
     {
         // find the instruction string
-        instr_string = *it;
+        instruction_string = *it;
 
-        // get the delimeter position of the first parenthesis
-        delim_position = instr_string.find(OPEN_INSTRUCTION_DELIMITER);
-        if(delim_position == std::string::npos) { return; }
+        // get the delimeter position of the first open parenthesis
+        delimter_position = instruction_string.find(OPEN_INSTRUCTION_DELIMITER);
+        if(delimter_position == std::string::npos) { return; }
 
-        opcode_string = instr_string.substr(0, delim_position).c_str();
-        opcode = generateOpcode(opcode_string);
-        instr_string.erase(0, delim_position + sizeof(OPEN_INSTRUCTION_DELIMITER));
+        // convert the opcode ascii representation into a single byte
+        sub_str = instruction_string.substr(0, delimter_position);
+        opcode_byte = generateOpcode(sub_str);
 
-        // find 'r'
-        while ( (delim_position = instr_string.find(REGISTER_IDENTIFIER)) != std::string::npos)
+        machine_code_file << opcode_byte;
+
+        // increment the string forward, 1 past the parenthesis. This is the register command.
+        instruction_string.erase(0, delimter_position + sizeof(OPEN_INSTRUCTION_DELIMITER));
+
+        // find the command, (between the parenthesis)
+        delimter_position = instruction_string.find(CLOSE_INSTRUCTION_DELIMITER);
+        instruction_string = instruction_string.substr(0, delimter_position);
+
+        // look for REGISTER_IDENTIFIER ('r's)
+        while((delimter_position = instruction_string.find(REGISTER_IDENTIFIER)) != std::string::npos)
         {
-            register_number_character = *instr_string.substr(delim_position + 1).c_str();
-            instr_string.erase(0, delim_position + sizeof(OPEN_INSTRUCTION_DELIMITER));
-            std::bitset<REGISTER_INSTRUCTION_SIZE> register_bitset((int)register_number_character);
-            register_array.push_back(register_bitset);
+            register_delimter_position = instruction_string.find(REGISTER_DELIMTER);
+            sub_str = instruction_string.substr(delimter_position + 1, register_delimter_position - 1);
+            cout << "operation includes register " << sub_str << endl;
+            instruction_string.erase(0,  sizeof(REGISTER_IDENTIFIER) + sub_str.length() + sizeof(REGISTER_DELIMTER));
+            
+            machine_code_file << (uint8_t)std::stoi(sub_str.c_str());
         }
-
-        // write the to the file
-        machine_code_file << opcode;
-
-        for (std::vector<std::bitset<REGISTER_INSTRUCTION_SIZE>>::iterator i = register_array.begin() ; i != register_array.end(); ++i)
-        {
-            std::bitset<REGISTER_INSTRUCTION_SIZE> register_index = *i;
-            machine_code_file << register_index;
-        }
-
-        register_array.clear();
-
-        machine_code_file << endl;
     }
 
-    // TODO: branch between different types
+    // TODO branch between different types of opcodes. (r-type, j-type, i-type) accordingly.
 }
 
-std::bitset<OPCODE_SIZE> generateOpcode(std::string opcode)
+uint8_t generateOpcode(std::string opcode)
 {
     if(opcode == ADD_S){
         return ADD_V;
