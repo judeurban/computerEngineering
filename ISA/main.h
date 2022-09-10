@@ -70,9 +70,8 @@ uint32_t* zero_register = &allRegisters[0];
 #define STORE_S "store"
 #define STORE_V 0xE
 
-// easter
-#define EGG_S "egg"
-#define EGG_V 0xF
+#define CONSOLE_S "console"
+#define CONSOLE_V 0xF
 
 // functions
 void readInstructions(void);

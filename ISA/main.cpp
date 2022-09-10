@@ -40,39 +40,46 @@ void readInstructions()
     std::ifstream instr_file("main.asm");
     std::string instr_string;
     char character;
+    
+    if (!instr_file.is_open()) {return;}
 
-    if (instr_file.is_open()) 
+    while (instr_file)
     {
-        while (instr_file)
-        {
-            character = instr_file.get();
-            
-            // saturate null terminator 
-            if (character == -1)
-            {
-                character = 0;
-            }
+        character = instr_file.get();
+        if (character < 0) break;
 
-            // new line, add this instruction to the list of allInstructions
-            if (instr_string.length() && character == '\n')
-            {
-                allInstructions.push_back(stripInstruction(instr_string));
-                instr_string.clear();
-            }
-            // continue building the instruction string
-            else
-            {
-                instr_string.push_back(character);
-            }
+        // comments!
+        if (character == '#')
+        {
+            // stall until the end of the line
+            while((character = instr_file.get()) != '\n' && character != '\r' && character > 0) {}
         }
 
-        // load the last instruction (the while loop terminates before we can add it)
-        if (instr_string.length())
+        // do not add any invalid characters (after the while loop above)
+        if(character < 0) {continue;}
+        
+        // new line, add this instruction to the list of allInstructions
+        if (instr_string.length() && character == '\n')
         {
             allInstructions.push_back(stripInstruction(instr_string));
+            cout << "adding " << instr_string << endl;
+            instr_string.erase();
         }
-
+        // continue building the instruction string
+        else if(character != '\n')
+        {
+            instr_string.push_back(character);
+        }
     }
+
+    // load the last instruction (the while loop terminates before we can add it)
+    if (instr_string.length())
+    {
+        allInstructions.push_back(stripInstruction(instr_string));
+        cout << "adding " << instr_string << endl;
+        instr_string.erase();
+    }
+
 }
 
 /**
@@ -147,7 +154,6 @@ void generateMachineCode()
         {
             register_delimter_position = instruction_string.find(REGISTER_DELIMTER);
             sub_str = instruction_string.substr(delimter_position + 1, register_delimter_position - 1);
-            cout << "operation includes register " << sub_str << endl;
             instruction_string.erase(0,  sizeof(REGISTER_IDENTIFIER) + sub_str.length() + sizeof(REGISTER_DELIMTER));
             
             machine_code_file << (uint8_t)std::stoi(sub_str.c_str());
@@ -204,8 +210,8 @@ uint8_t generateOpcode(std::string opcode)
     else if(opcode == STORE_S){
         return STORE_V;
     }
-    else if(opcode == EGG_S){
-        return EGG_V;
+    else if(opcode == CONSOLE_S){
+        return CONSOLE_V;
     }
 
     return 0;
