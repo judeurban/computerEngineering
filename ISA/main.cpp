@@ -5,6 +5,22 @@ using namespace std;
 
 // TODO: do not allow a write of the zero register
 
+#define ISA_ASSEMBLY_FILE "main.asm"
+#define MACHINE_CODE_FILE "machine_code.bin"
+
+// TODO: J-type, enumerate the encoding of each label? Save for later.
+// Reading the line, if you encounter a ':' character (or some other identifier), enumerate some index
+// and store that instruction in memory (instruciton index) to be executed later
+
+// int enumerater_i = 0
+// vector labelVector;
+// while(readingFile)
+    // if newinstruction has a ':'
+        // allInstructionsVector.push_back(newInstruction)
+        // labelVector.push_back(&allInstructionsVector[end])
+
+        // probably 
+
 std::string stripInstruction(std::string &instruction)
 {
     std::string stripped_instruction;
@@ -37,7 +53,7 @@ bool isValidCharacter(char character)
 
 void readInstructions()
 {
-    std::ifstream instr_file("main.asm");
+    std::ifstream instr_file(ISA_ASSEMBLY_FILE);
     std::string instr_string;
     char character;
     
@@ -109,7 +125,7 @@ void printInstructions()
 
 void generateMachineCode()
 {
-    std::ofstream machine_code_file("machine_code_file.txt", std::ios::out | std::ios::binary);
+    std::ofstream machine_code_file(MACHINE_CODE_FILE, std::ios::out | std::ios::binary);
     size_t delimter_position;
     size_t register_delimter_position;
 
@@ -193,7 +209,25 @@ void generateMachineCode()
                 immediate_float = std::stof(sub_str.c_str());
                 machine_code_file.write(reinterpret_cast<const char*>(&immediate_float), sizeof(float));
             }
-            // }
+            else if(opcode_byte = CONSOLE_V)
+            {
+                // Find the register number
+                delimter_position = instruction_string.find(REGISTER_IDENTIFIER);
+                register_delimter_position = instruction_string.find(REGISTER_DELIMTER);
+                sub_str = instruction_string.substr(delimter_position + 1, register_delimter_position - 1);
+                instruction_string.erase(0,  sizeof(REGISTER_IDENTIFIER) + sub_str.length() + sizeof(REGISTER_DELIMTER));
+
+                // write the register location as machine code
+                register_byte = (uint8_t)std::stoi(sub_str.c_str());
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+
+                // pad the rest of the instruction with zeros
+                register_byte = 0;
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+
+            }
+           
         }
     }
 
@@ -254,11 +288,43 @@ uint8_t generateOpcode(std::string opcode)
     return 0;
 }
 
+void processMachineCode()
+{
+    // open the file
+    std::ifstream instr_file(ISA_ASSEMBLY_FILE);
+
+    // decode each instruction (32 bits, 4 bytes)
+    // EXCEPT when a float is encoded
+
+    // have a FIFO buffer of six bytes or something. Some instructions may or may utilize all six bytes.
+
+    // pseudocode:
+
+    // opcode = bytes[0]
+    // if opcode is an R-type:
+        // for i in range(3):
+            // find the three registers
+        
+        // do the operation
+
+    // elif opcode is a J-Type:
+        // ?
+
+    // elif opcode is a I-Type:
+        // register = bytes[1]
+
+        // next FOUR bytes is the encoded float value
+        // do the operation
+
+
+}
+
 int main(int argc, const char *argv[])
 {
     readInstructions();
-    // printInstructions();
     generateMachineCode();
+
+    processMachineCode();
 
     return 0;
 }

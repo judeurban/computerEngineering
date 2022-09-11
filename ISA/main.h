@@ -94,4 +94,6 @@ const uint8_t invalidCharacterLen = sizeof(invalidCharacters)/sizeof(invalidChar
 void generateMachineCode(void);
 uint8_t generateOpcode(std::string);
 
+void processMachineCode(void);
+
 #endif
