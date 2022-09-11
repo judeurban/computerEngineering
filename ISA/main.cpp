@@ -62,7 +62,6 @@ void readInstructions()
         if (instr_string.length() && character == '\n')
         {
             allInstructions.push_back(stripInstruction(instr_string));
-            cout << "adding " << instr_string << endl;
             instr_string.erase();
         }
         // continue building the instruction string
@@ -76,10 +75,8 @@ void readInstructions()
     if (instr_string.length())
     {
         allInstructions.push_back(stripInstruction(instr_string));
-        cout << "adding " << instr_string << endl;
         instr_string.erase();
     }
-
 }
 
 /**
@@ -112,7 +109,7 @@ void printInstructions()
 
 void generateMachineCode()
 {
-    std::ofstream machine_code_file("machine_code_file.txt");
+    std::ofstream machine_code_file("machine_code_file.txt", std::ios::out | std::ios::binary);
     size_t delimter_position;
     size_t register_delimter_position;
 
@@ -122,10 +119,12 @@ void generateMachineCode()
 
     uint8_t opcode_byte;
     uint8_t register_byte;
+    float immediate_float;
 
     if(!machine_code_file.is_open()) { return; }
 
-    // TODO: left shift by 4, then AND with the register to create represent each with four bits?
+    // TODO: left shift by 4, then AND with the register to create represent each with four Fbits?
+    // NOTE: using BIG endian encoding
 
     for (std::vector<std::string>::iterator it = allInstructions.begin() ; it != allInstructions.end(); ++it)
     {
@@ -140,7 +139,8 @@ void generateMachineCode()
         sub_str = instruction_string.substr(0, delimter_position);
         opcode_byte = generateOpcode(sub_str);
 
-        machine_code_file << opcode_byte;
+        // write the opcode to the file
+        machine_code_file.write(reinterpret_cast<const char*>(&opcode_byte), sizeof(uint8_t));
 
         // increment the string forward, 1 past the parenthesis. This is the register command.
         instruction_string.erase(0, delimter_position + sizeof(OPEN_INSTRUCTION_DELIMITER));
@@ -149,14 +149,51 @@ void generateMachineCode()
         delimter_position = instruction_string.find(CLOSE_INSTRUCTION_DELIMITER);
         instruction_string = instruction_string.substr(0, delimter_position);
 
-        // look for REGISTER_IDENTIFIER ('r's)
-        while((delimter_position = instruction_string.find(REGISTER_IDENTIFIER)) != std::string::npos)
+        // REGISTER-TYPE
+        if(opcode_byte < JUMP_V)
         {
-            register_delimter_position = instruction_string.find(REGISTER_DELIMTER);
-            sub_str = instruction_string.substr(delimter_position + 1, register_delimter_position - 1);
-            instruction_string.erase(0,  sizeof(REGISTER_IDENTIFIER) + sub_str.length() + sizeof(REGISTER_DELIMTER));
-            
-            machine_code_file << (uint8_t)std::stoi(sub_str.c_str());
+            // look for REGISTER_IDENTIFIER ('r's)
+            while((delimter_position = instruction_string.find(REGISTER_IDENTIFIER)) != std::string::npos)
+            {
+                register_delimter_position = instruction_string.find(REGISTER_DELIMTER);
+                sub_str = instruction_string.substr(delimter_position + 1, register_delimter_position - 1);
+                instruction_string.erase(0,  sizeof(REGISTER_IDENTIFIER) + sub_str.length() + sizeof(REGISTER_DELIMTER));
+                
+                // write the register location as machine code
+                register_byte = (uint8_t)std::stoi(sub_str.c_str());
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+            }
+        }
+        // JUMP-TYPE
+        else if(opcode_byte < LOAD_V)
+        {
+            // TODO
+        }
+        // IMMEDIATE-TYPE
+        else
+        {
+            if(opcode_byte == LOAD_V)
+            {
+
+                // Find the register number
+                delimter_position = instruction_string.find(REGISTER_IDENTIFIER);
+                register_delimter_position = instruction_string.find(REGISTER_DELIMTER);
+                sub_str = instruction_string.substr(delimter_position + 1, register_delimter_position - 1);
+                instruction_string.erase(0,  sizeof(REGISTER_IDENTIFIER) + sub_str.length() + sizeof(REGISTER_DELIMTER));
+                
+                // write the register location as machine code
+                register_byte = (uint8_t)std::stoi(sub_str.c_str());
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+
+                // find the ')'
+                delimter_position = instruction_string.find(CLOSE_INSTRUCTION_DELIMITER);
+                sub_str = instruction_string.substr(0, delimter_position - 1);
+
+                // write the float value as machine code
+                immediate_float = std::stof(sub_str.c_str());
+                machine_code_file.write(reinterpret_cast<const char*>(&immediate_float), sizeof(float));
+            }
+            // }
         }
     }
 

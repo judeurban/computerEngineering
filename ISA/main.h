@@ -64,7 +64,7 @@ uint32_t* zero_register = &allRegisters[0];
 #define BRANCH_V 0xC
 
 // memory operations
-#define LOAD_S "load"
+#define LOAD_S "loadf"
 #define LOAD_V 0xD
 
 #define STORE_S "store"
