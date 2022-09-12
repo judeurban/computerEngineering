@@ -1,17 +1,50 @@
+# INSTRUCTION DEFINITIONS
+
+# ==============
+# R-TYPE
+# ==============
+
+# maths
 addi
 addf
 subi
-mul
-div
+subf
+muli
+mulf
+divi
+divf
+slt
+
+# ==============
+# logical
+# ==============
+
 not
 and
 nand
 or
 nor
 xor
-slt
+
+# ==============
+# J-TYPE
+# ==============
+
+# branching
 jump
 beq
+
+
+# ==============
+# I-TYPE
+# ==============
+
+# loading
+loadi
 loadf
+
+# storing
 store
+
+# printing to console
 console

@@ -181,14 +181,14 @@ void generateMachineCode()
             }
         }
         // JUMP-TYPE
-        else if(opcode_byte < LOAD_V)
+        else if(opcode_byte < LOADI_V)
         {
             // TODO
         }
         // IMMEDIATE-TYPE
         else
         {
-            if(opcode_byte == LOAD_V)
+            if(opcode_byte == LOADF_V)
             {
 
                 // Find the register number
@@ -242,18 +242,35 @@ void generateMachineCode()
 
 uint8_t generateOpcode(std::string opcode)
 {
-    if(opcode == ADD_S){
-        return ADD_V;
+    // MATH, INTEGERS
+    if(opcode == ADDI_S){
+        return ADDI_V;
     }
-    else if(opcode == SUB_S){
-        return SUB_V;
+    else if(opcode == SUBI_S){
+        return SUBI_V;
     }
-    else if(opcode == MUL_S){
-        return MUL_V;
+    else if(opcode == MULI_S){
+        return MULI_V;
     }
-    else if(opcode == DIV_S){
-        return DIV_V;
+    else if(opcode == DIVI_S){
+        return DIVI_V;
     }
+
+    // MATH, FLOATS
+    else if(opcode == ADDF_S){
+        return ADDF_V;
+    }
+    else if(opcode == SUBF_S){
+        return SUBF_V;
+    }
+    else if(opcode == MULF_S){
+        return MULF_V;
+    }
+    else if(opcode == DIVF_S){
+        return DIVF_V;
+    }
+
+    // LOGICAL
     else if(opcode == NOT_S){
         return NOT_V;
     }
@@ -272,17 +289,14 @@ uint8_t generateOpcode(std::string opcode)
     else if(opcode == XOR_S){
         return XOR_V;
     }
-    else if(opcode == SET_LESS_THAN_S){
-        return SET_LESS_THAN_V;
+    else if(opcode == SLT_S){
+        return SLT_V;
     }
     else if(opcode == JUMP_S){
         return JUMP_V;
     }
-    else if(opcode == BRANCH_S){
-        return BRANCH_V;
-    }
-    else if(opcode == LOAD_S){
-        return LOAD_V;
+    else if(opcode == BEQ_S){
+        return BEQ_V;
     }
     else if(opcode == STORE_S){
         return STORE_V;
@@ -291,7 +305,16 @@ uint8_t generateOpcode(std::string opcode)
         return CONSOLE_V;
     }
 
-    return 0;
+    // MEMORY, INTEGERS
+    else if(opcode == LOADI_S){
+        return LOADI_V;
+    }
+    // MEMORY, FLOATS
+    else if(opcode == LOADF_S){
+        return LOADF_V;
+    }
+
+    return -1;
 }
 
 void processMachineCode()
@@ -316,7 +339,7 @@ void processMachineCode()
         opcode = bytes[0];
 
         // R-Type
-        if (opcode < SET_LESS_THAN_V)
+        if (opcode < SLT_V)
         {
             destination_register = bytes[1];
             source_register1 = bytes[2];
@@ -366,7 +389,7 @@ int main(int argc, const char *argv[])
     readInstructions();
     generateMachineCode();
 
-    // processMachineCode();
+    processMachineCode();
 
     return 0;
 }
