@@ -1,0 +1,17 @@
+addi
+addf
+subi
+mul
+div
+not
+and
+nand
+or
+nor
+xor
+slt
+jump
+beq
+loadf
+store
+console

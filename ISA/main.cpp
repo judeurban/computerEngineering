@@ -205,9 +205,15 @@ void generateMachineCode()
                 delimter_position = instruction_string.find(CLOSE_INSTRUCTION_DELIMITER);
                 sub_str = instruction_string.substr(0, delimter_position - 1);
 
+                // pad the rest of the instruction with zeros
+                register_byte = 0;
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+
                 // write the float value as machine code
                 immediate_float = std::stof(sub_str.c_str());
                 machine_code_file.write(reinterpret_cast<const char*>(&immediate_float), sizeof(float));
+
             }
             else if(opcode_byte = CONSOLE_V)
             {
@@ -291,10 +297,43 @@ uint8_t generateOpcode(std::string opcode)
 void processMachineCode()
 {
     // open the file
-    std::ifstream instr_file(ISA_ASSEMBLY_FILE);
+    std::ifstream instr_file(MACHINE_CODE_FILE);
+    uint8_t opcode;
+    uint8_t destination_register;
+    uint8_t source_register1;
+    uint8_t source_register2;
+    uint8_t bytes[4];
+    uint32_t instruction;
+
+    while (instr_file)
+    {
+
+        for(int i = 0 ; i < 4 ; i++)
+        {
+            bytes[i] = instr_file.get();
+        }
+
+        opcode = bytes[0];
+
+        // R-Type
+        if (opcode < SET_LESS_THAN_V)
+        {
+            destination_register = bytes[1];
+            source_register1 = bytes[2];
+            source_register2 = bytes[3];
+        }
+        // I-Type
+        else if(opcode < CONSOLE_V)
+        {
+
+        }
+
+    }
 
     // decode each instruction (32 bits, 4 bytes)
     // EXCEPT when a float is encoded
+
+
 
     // have a FIFO buffer of six bytes or something. Some instructions may or may utilize all six bytes.
 
@@ -315,8 +354,11 @@ void processMachineCode()
 
         // next FOUR bytes is the encoded float value
         // do the operation
+}
 
-
+void addRegisters(uint8_t* rd, uint8_t* r1, uint8_t* r2)
+{
+    *rd = (float)*r1 + (float)*r2;
 }
 
 int main(int argc, const char *argv[])
@@ -324,7 +366,7 @@ int main(int argc, const char *argv[])
     readInstructions();
     generateMachineCode();
 
-    processMachineCode();
+    // processMachineCode();
 
     return 0;
 }

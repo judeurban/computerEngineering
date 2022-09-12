@@ -1,5 +1,18 @@
+# a bad idea to add executables to a repo. Why would you need to?
 *.exe
+
+# .vscode settings
 .vscode
-*.txt
+
+# ?
 *.pdb
+
+# this directory is not source, and changes every time I build it.
+# I don't need to track changes.
 build/
+
+# I want to ignore all text files
+*.txt
+
+# except for this one
+!buildingC/defines.txt

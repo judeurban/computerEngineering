@@ -17,61 +17,40 @@ uint32_t allRegisters[NUMBER_OF_REGISTERS];
 uint32_t* zero_register = &allRegisters[0];
 
 // OP-CODES
-
-// maths
-
-#define ADD_S "add"
-#define ADD_V 0x0
-
-#define SUB_S "sub"
-#define SUB_V 0x1
-
+#define ADDI_S "addi"
+#define ADDI_V 0x0
+#define ADDF_S "addf"
+#define ADDF_V 0x1
+#define SUBI_S "subi"
+#define SUBI_V 0x2
 #define MUL_S "mul"
-#define MUL_V 0x2
-
+#define MUL_V 0x3
 #define DIV_S "div"
-#define DIV_V 0x3
-
-// logical
-
+#define DIV_V 0x4
 #define NOT_S "not"
-#define NOT_V 0x4
-
+#define NOT_V 0x5
 #define AND_S "and"
-#define AND_V 0x5
-
+#define AND_V 0x6
 #define NAND_S "nand"
-#define NAND_V 0x6
-
+#define NAND_V 0x7
 #define OR_S "or"
-#define OR_V 0x7
-
+#define OR_V 0x8
 #define NOR_S "nor"
-#define NOR_V 0x8
-
+#define NOR_V 0x9
 #define XOR_S "xor"
-#define XOR_V 0x9
-
-// operations
-#define SET_LESS_THAN_S "slt"
-#define SET_LESS_THAN_V 0xA
-
-// choose
+#define XOR_V 0xa
+#define SLT_S "slt"
+#define SLT_V 0xb
 #define JUMP_S "jump"
-#define JUMP_V 0xB
-
-#define BRANCH_S "beq"
-#define BRANCH_V 0xC
-
-// memory operations
-#define LOAD_S "loadf"
-#define LOAD_V 0xD
-
+#define JUMP_V 0xc
+#define BEQ_S "beq"
+#define BEQ_V 0xd
+#define LOADF_S "loadf"
+#define LOADF_V 0xe
 #define STORE_S "store"
-#define STORE_V 0xE
-
+#define STORE_V 0xf
 #define CONSOLE_S "console"
-#define CONSOLE_V 0xF
+#define CONSOLE_V 0x10
 
 // functions
 void readInstructions(void);
