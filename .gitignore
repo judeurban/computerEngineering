@@ -16,3 +16,6 @@ build/
 
 # except for this one
 !buildingC/defines.txt
+
+*.ilk
+*.obj

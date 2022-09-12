@@ -322,33 +322,83 @@ void processMachineCode()
     // open the file
     std::ifstream instr_file(MACHINE_CODE_FILE);
     uint8_t opcode;
-    uint8_t destination_register;
-    uint8_t source_register1;
-    uint8_t source_register2;
+
+    uint8_t destination_register_idx;
+    uint32_t* destination_register;
+
+    uint8_t source_register1_idx;
+    uint32_t* source_register1;
+
+    uint8_t source_register2_idx;
+    uint32_t* source_register2;
+
     uint8_t bytes[4];
     uint32_t instruction;
+    bool floatFLAG = false;
 
     while (instr_file)
     {
 
+        // load the entire instruction. All four bytes
         for(int i = 0 ; i < 4 ; i++)
         {
             bytes[i] = instr_file.get();
         }
 
+        // check to see if the FLOAT flag is true. If it is, then process
+        // the previous instruction that contained a float operation.
+        if (floatFLAG)
+        {
+            floatFLAG = false;
+
+            // process PREVIOUS instruction!
+            if (opcode == LOADF_V)
+            {
+                memcpy(destination_register, bytes, sizeof(bytes));
+            }
+        }
+
         opcode = bytes[0];
 
         // R-Type
-        if (opcode < SLT_V)
+        if (opcode < JUMP_V)
         {
-            destination_register = bytes[1];
-            source_register1 = bytes[2];
-            source_register2 = bytes[3];
+            // destination_register_idx = bytes[1];
+            // source_register1_idx = bytes[2];
+            // source_register2_idx = bytes[3];
+
+            destination_register = &allRegisters[bytes[1]];
+            source_register1 = &allRegisters[bytes[2]];
+            source_register2 = &allRegisters[bytes[3]];
+
+            // TODO: make remainder of function calls here
+            if(opcode == DIVF_V)
+            {
+                DIVF(destination_register, source_register1, source_register2);
+            }
         }
-        // I-Type
-        else if(opcode < CONSOLE_V)
+
+        // J-Type
+        else if(opcode < LOADI_V)
         {
 
+        }
+
+        // I-Type
+        else
+        {
+            destination_register_idx = bytes[1];
+            destination_register = &allRegisters[destination_register_idx];
+
+            if(opcode == LOADF_V || opcode == LOADI_V)
+            {
+                // flag true so that the next four bytes read is the FLOAT value
+                floatFLAG = true;
+            }
+            else if(opcode == CONSOLE_V)
+            {
+                CONSOLE(destination_register);
+            }
         }
 
     }
@@ -379,9 +429,33 @@ void processMachineCode()
         // do the operation
 }
 
-void addRegisters(uint8_t* rd, uint8_t* r1, uint8_t* r2)
+void DIVF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 {
-    *rd = (float)*r1 + (float)*r2;
+    float rd_value;
+    float r1_value;
+    float r2_value;
+
+    memcpy(&r1_value, r1, sizeof(float));
+    memcpy(&r2_value, r2, sizeof(float));
+
+    // operation
+    if (r2_value == 0.0)
+    {
+        cout << "you cannot divide by zero" << endl;
+        rd_value = -1.0;
+    }
+    else
+    {
+        rd_value =  r1_value / r2_value;
+    }
+
+    // memory write
+    memcpy(r_destination, &rd_value, sizeof(float));
+}
+
+void CONSOLE(uint32_t* registerToPrint)
+{
+    printf("0x%x", (uint32_t) *registerToPrint);
 }
 
 int main(int argc, const char *argv[])

@@ -94,4 +94,9 @@ uint8_t generateOpcode(std::string);
 
 void processMachineCode(void);
 
+// FUNCTIONS
+
+void DIVF(uint32_t*, uint32_t*, uint32_t*);
+void CONSOLE(uint32_t*);
+
 #endif
