@@ -10,8 +10,11 @@
 # r3 contains the result of pi
 
 # load the status values into the registers
-loadf(r1, 31.4159265359)         # circumference
-loadf(r2, 0.0)                  # diameter
+loadf(r1, 15.7079632679)         # circumference
+loadf(r2, 5.0)                  # diameter
 
 divf(r3, r1, r2)                 # calculate pi
 console(r3)                      # print the value in r3 to the console
+
+# this outputs 0x40490fda which, converted to IEEE-754 
+# floating point algorithm is 3.14159
