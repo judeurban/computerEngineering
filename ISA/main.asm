@@ -1,8 +1,8 @@
 # code for calculating pi!
 
 # pseudocode to calculate the ratio of pi:
-# diameter = 10.0
-# circumference = 3.18309886184
+# diameter = 5.0
+# circumference = 15.7079632679
 # pi = circumference / diameter
 
 # r1 contains the circumference
@@ -11,7 +11,7 @@
 
 # load the status values into the registers
 loadf(r1, 15.7079632679)         # circumference
-loadf(r2, 5.0)                  # diameter
+loadf(r2, 5.0)                   # diameter
 
 divf(r3, r1, r2)                 # calculate pi
 console(r3)                      # print the value in r3 to the console

@@ -6,19 +6,26 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include "functions.hpp"
 
-#define NUMBER_OF_REGISTERS 8       //
-#define MAXIMUM_INSTRUCTIONS 10     //
-#define OPCODE_SIZE 4               // bits
-#define REGISTER_INSTRUCTION_SIZE 4               // bits
+#define NUMBER_OF_REGISTERS 8
+#define MAXIMUM_INSTRUCTIONS 10
+#define INSTRUCTION_SIZE 4             // bytes
+
+#define ISA_ASSEMBLY_FILE "main.asm"
+#define MACHINE_CODE_FILE "machine_code.bin"
 
 // REGISTERS
 uint32_t allRegisters[NUMBER_OF_REGISTERS];
 uint32_t* zero_register = &allRegisters[0];
 
-// OPCODES
-// =========================================
+// INSTRUCTIONS
+std::vector<std::string> allInstructions;
+const char invalidCharacters[] = {'\n', ' '};
+const uint8_t invalidCharacterLen = sizeof(invalidCharacters)/sizeof(char);
 
+// =========================================
+// OPCODES
 
 // == R-TYPE ==
 #define ADDI_S "addi"
@@ -68,35 +75,7 @@ uint32_t* zero_register = &allRegisters[0];
 #define CONSOLE_S "console"
 #define CONSOLE_V 0x14
 
+// total operations: 0x15 = Od21
 // =========================================
-// total instructions: 0x15 = Od21
-
-// functions
-void readInstructions(void);
-void printInstructions(void);
-bool isValidCharacter(char);
-void createRegisters(void);
-void destroyRegisters(void);
-void printRegisters(void);
-
-// instruction business
-std::vector<std::string> allInstructions;
-const char invalidCharacters[] = {'\n', ' '};
-const uint8_t invalidCharacterLen = sizeof(invalidCharacters)/sizeof(invalidCharacters[0]);
-
-#define OPEN_INSTRUCTION_DELIMITER '('
-#define CLOSE_INSTRUCTION_DELIMITER ')'
-#define REGISTER_IDENTIFIER 'r'
-#define REGISTER_DELIMTER ','
-
-void generateMachineCode(void);
-uint8_t generateOpcode(std::string);
-
-void processMachineCode(void);
-
-// FUNCTIONS
-
-void DIVF(uint32_t*, uint32_t*, uint32_t*);
-void CONSOLE(uint32_t*);
 
 #endif

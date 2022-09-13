@@ -15,8 +15,8 @@ with open('defines.txt', 'r') as f:
 
     lines = f.readlines()
 
-    print("// OPCODES")
-    print("// =========================================\n")
+    print("// =========================================")
+    print("// OPCODES\n")
 
     for line in lines:
         line = line.strip()
@@ -38,6 +38,5 @@ with open('defines.txt', 'r') as f:
         i += 1
 
 
-    print("\n// =========================================")
-
-    print("// total instructions:", hex(i), f'= Od{i}')
+    print("\n// total operations:", hex(i), f'= Od{i}')
+    print("// =========================================")
