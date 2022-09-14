@@ -1,8 +1,6 @@
 #include <iostream>
 #include "main.h"
 
-// using namespace std;
-
 #define OPEN_INSTRUCTION_DELIMITER '('
 #define CLOSE_INSTRUCTION_DELIMITER ')'
 #define REGISTER_IDENTIFIER 'r'

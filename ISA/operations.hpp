@@ -1,8 +1,6 @@
 #include <iostream>
 #include "main.h"
 
-// using namespace std;
-
 // float representation
 static float rd_f;
 static float r1_f;
