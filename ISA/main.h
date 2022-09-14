@@ -9,13 +9,12 @@
 #include "operations.hpp"
 
 #define NUMBER_OF_REGISTERS 8
-#define MAXIMUM_INSTRUCTIONS 10
 #define INSTRUCTION_SIZE 4             // bytes
-#define MAX_LABEL_SIZE 10               // character
 
 // #define ISA_ASSEMBLY_FILE "pi.asm"
-#define ISA_ASSEMBLY_FILE "for_loop.asm"
+// #define ISA_ASSEMBLY_FILE "for_loop.asm"
 #define MACHINE_CODE_FILE "machine_code.bin"
+std::string ISA_ASSEMBLY_FILE;
 
 // REGISTERS
 uint32_t allRegisters[NUMBER_OF_REGISTERS];

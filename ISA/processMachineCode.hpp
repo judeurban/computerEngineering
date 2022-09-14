@@ -16,17 +16,25 @@ uint32_t* programCounter;                               // the address of the ne
 void readMachineCode()
 {
     // open the file
-    std::ifstream instr_file(MACHINE_CODE_FILE);
+    std::ifstream machine_code_file(MACHINE_CODE_FILE);
     uint8_t bytes[4];
     uint32_t* instruction_ptr;
     uint8_t byte;
 
-    while (instr_file)
+    if (!machine_code_file.is_open())
+    {
+        std::cout << "\nERROR: There is no machine code file." << std::endl;
+        std::cout << "You must first generate a machine code file by specificing it as an option when running main.exe" << std::endl;
+        std::cout << "\nTry: ./main.exe pi.asm\n" << std::endl;
+        return;
+    }
+
+    while (machine_code_file)
     {
         // load the entire instruction. All four bytes
         for(int i = 0 ; i < INSTRUCTION_SIZE ; i++)
         {
-            byte = instr_file.get();
+            byte = machine_code_file.get();
 
             // end of file!
             if(byte == (uint8_t)-1)
@@ -73,6 +81,12 @@ void processMachineCode()
     uint8_t bytes[4];
 
     uint8_t jump_to_label_enum;
+
+    // do not proceess empty an empty vector of instructions
+    if (instructions.size() == 0)
+    {
+        return;
+    }
 
     // start on the FIRST instruction, initialize the programCounter
     instruction_idx = 0;

@@ -149,7 +149,11 @@ void generateMachineCode()
     float immediate_float;
     int immediate_int;
 
-    if(!machine_code_file.is_open()) { return; }
+    if (!machine_code_file.is_open())
+    {
+        std::cout << "Could not open the machine code file" << std::endl;
+        return;
+    }
 
     // TODO: left shift by 4, then AND with the register to create represent each with four Fbits?
     // NOTE: using BIG endian encoding
