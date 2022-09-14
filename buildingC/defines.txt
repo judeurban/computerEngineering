@@ -33,7 +33,7 @@ xor
 # branching
 jump
 beq
-
+bne
 
 # ==============
 # I-TYPE

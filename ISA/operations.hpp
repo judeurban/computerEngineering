@@ -9,11 +9,13 @@ static float r1_f;
 static float r2_f;
 
 // signed int representation
-static int rd_i;
-static int r1_i;
-static int r2_i;
+static uint32_t rd_i;
+static uint32_t r1_i;
+static uint32_t r2_i;
 
+void LOADF(uint32_t*, uint32_t*);
 void DIVF(uint32_t*, uint32_t*, uint32_t*);
+int BNE(uint32_t*, uint32_t*);
 void CONSOLE(uint32_t*);
 
 void ADDF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
@@ -40,7 +42,27 @@ void ADDI(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
     memcpy(r_destination, &rd_i, sizeof(float));
 }
 
+void LOADF(uint32_t* r_destination, uint32_t* instruction)
+{
+    memcpy(r_destination, instruction, sizeof(instruction));
+}
 
+void LOADI(uint32_t* r_destination, uint32_t* instruction)
+{
+    memcpy(r_destination, instruction, sizeof(instruction));
+}
+
+int BNE(uint32_t* r1, uint32_t* r2)
+{
+    // TRUE if they're not equal
+    if(*r1 != *r2)
+    {
+        return 1;
+    }
+
+    // False otherwise
+    return 0;
+}
 
 void DIVF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 {
@@ -64,5 +86,5 @@ void DIVF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 
 void CONSOLE(uint32_t* registerToPrint)
 {
-    printf("0x%x", (uint32_t) *registerToPrint);
+    printf("Register 0x%x contains the value 0x%x\n", registerToPrint, (uint32_t) *registerToPrint);
 }

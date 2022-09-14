@@ -5,9 +5,10 @@ void readMachineCode(void);
 void processMachineCode(void);
 bool zeroRegisterIsDestinationRegister(uint32_t*);
 bool checkRegisterIndex(uint8_t*);
+void printBinInstructions(void);
 
 label* findLabelFromEnum(uint8_t);
-uint8_t findIndexFromInstruction(uint32_t*);
+uint8_t findIndexFromInstruction(uint32_t);
 
 static std::vector<label*> machineLabels;
 
@@ -43,7 +44,7 @@ void readMachineCode()
         {
             label* l = new label;
             l->enumerator = (uint8_t)bytes[1];
-            l->instruction = &instruction;
+            l->instruction = instruction;
             machineLabels.push_back(l);
         }
     }
@@ -93,7 +94,7 @@ void processMachineCode()
 
     uint32_t instruction;
     // uint32_t* currentInstruction;
-    bool floatFLAG = false;
+    bool immediateFLAG = false;
     uint8_t bytes[4];
 
     uint8_t jump_to_label_enum;
@@ -115,15 +116,22 @@ void processMachineCode()
             programCounter = NULL;
         }
         
-        // Read a float instead of an instruction
-        if (floatFLAG)
+        // Read an immediate instead of an instruction
+        if (immediateFLAG)
         {
-            floatFLAG = false;
+            immediateFLAG = false;
 
             // process PREVIOUS instruction!
-            if (opcode == LOADF_V)
+            switch (opcode)
             {
-                memcpy(destination_register, &instruction, sizeof(bytes));
+            case LOADF_V:
+                LOADF(destination_register, &instruction);
+                break;
+            case LOADI_V:
+                LOADI(destination_register, &instruction);
+                break;
+            default:
+                break;
             }
 
             // operation complete, analyze the next instruciton
@@ -150,14 +158,18 @@ void processMachineCode()
             source_register2 = &allRegisters[bytes[3]];
 
             // ignore if they're tryna write into the zero register
-            if(zeroRegisterIsDestinationRegister(destination_register)) 
-                return;
+            // if(zeroRegisterIsDestinationRegister(destination_register) && opcode != CONSOLE_V) 
+            //     continue;
 
             // TODO: make remainder of function calls here
             switch (opcode)
             {
             case ADDF_V:
                 ADDF(destination_register, source_register1, source_register2);
+                break;
+
+            case ADDI_V:
+                ADDI(destination_register, source_register1, source_register2);
                 break;
 
             case DIVF_V:
@@ -172,15 +184,32 @@ void processMachineCode()
         // J-Type
         else if(opcode < LOADI_V)
         {
-            cout << "\n\nJ TYPE!!" << endl;
-            jump_to_label_enum = bytes[1];
+            switch (opcode)
+            {
+            case JUMP_V:
+                jump_to_label_enum = bytes[1];
+                // reset the PC incremetor to the index associaed with a paritcular instr
+                // programCounter = machineLabels.at(jump_to_label_enum)->instruction;
+                instruction_idx = findIndexFromInstruction(machineLabels.at(jump_to_label_enum)->instruction);
+                break;
+            case  BNE_V:
 
-            // reset the PC incremetor to the index associaed with a paritcular instr
-            programCounter = machineLabels.at(jump_to_label_enum)->instruction;
-            instruction_idx = findIndexFromInstruction(machineLabels.at(jump_to_label_enum)->instruction);
+                source_register1 = &allRegisters[bytes[1]];
+                source_register2 = &allRegisters[bytes[2]];
 
-            cout << "jumping to" << (char)(jump_to_label_enum+30) << endl;
-            cout << "reset PC to" << (char)(jump_to_label_enum+30) << endl;
+                if(BNE(source_register1, source_register2))
+                {
+                    jump_to_label_enum = bytes[3];
+
+                    // reset the PC incremetor to the index associaed with a paritcular instr
+                    instruction_idx = findIndexFromInstruction(machineLabels.at(jump_to_label_enum)->instruction);
+                }
+                
+                break;          
+            default:
+                break;
+            }
+
         }
 
         // I-Type
@@ -188,17 +217,20 @@ void processMachineCode()
         {
             // retrieve the register associate with that particular index
             destination_register = &allRegisters[bytes[1]];
-            if(zeroRegisterIsDestinationRegister(destination_register))
-                return;
+
+            if(opcode == CONSOLE_V)
+            {
+                CONSOLE(destination_register);
+                continue;
+            }
+
+            // if(zeroRegisterIsDestinationRegister(destination_register))
+            //     return;
 
             if(opcode == LOADF_V || opcode == LOADI_V)
             {
                 // flag true so that the next four bytes read is the FLOAT value
-                floatFLAG = true;
-            }
-            else if(opcode == CONSOLE_V)
-            {
-                CONSOLE(destination_register);
+                immediateFLAG = true;
             }
         }
     }
@@ -243,15 +275,14 @@ bool checkRegisterIndex(uint8_t* bytes)
 // }
 
 
-uint8_t findIndexFromInstruction(uint32_t* instr)
+uint8_t findIndexFromInstruction(uint32_t instr)
 {
-    uint32_t instruction;
     uint8_t iter = 0;
+    uint32_t* instruction_ptr;
 
     for (std::vector<uint32_t>::iterator it = instructions.begin() ; it != instructions.end(); ++it)
     {
-        instruction = *it;
-        if(instruction == *instr)
+        if(instructions.at(iter) == instr)
         {
             return iter;
         }

@@ -8,7 +8,6 @@ using namespace std;
 bool compile = true;
 
 // TODO: do not allow a write of the zero register
-
 // TODO: J-type, enumerate the encoding of each label? Save for later.
 // Reading the line, if you encounter a ':' character (or some other identifier), enumerate some index
 // and store that instruction in memory (instruciton index) to be executed later

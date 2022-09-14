@@ -77,8 +77,12 @@ void readInstructions()
         // new line, add this instruction to the list of allStringInstructions
         if (instr_string.length() && character == '\n')
         {
-            allStringInstructions.push_back(stripInstruction(instr_string));
-            instr_string.erase();
+            instr_string = stripInstruction(instr_string);
+            if(instr_string.length() > 0)
+            {
+                allStringInstructions.push_back(stripInstruction(instr_string));
+                instr_string.erase();
+            }
         }
         // continue building the instruction string
         else if(character != '\n')
@@ -90,9 +94,15 @@ void readInstructions()
     // load the last instruction (the while loop terminates before we can add it)
     if (instr_string.length())
     {
-        allStringInstructions.push_back(stripInstruction(instr_string));
-        instr_string.erase();
+        instr_string = stripInstruction(instr_string);
+        if(instr_string.length() > 0)
+        {
+            allStringInstructions.push_back(stripInstruction(instr_string));
+            instr_string.erase();
+        }
     }
+
+    // printInstructions();
 }
 
 /**
@@ -137,6 +147,7 @@ void generateMachineCode()
     uint8_t register_byte;
     uint8_t label_enumerator = 0;
     float immediate_float;
+    int immediate_int;
 
     if(!machine_code_file.is_open()) { return; }
 
@@ -216,44 +227,88 @@ void generateMachineCode()
         // JUMP-TYPE
         else if(opcode_byte < LOADI_V)
         {
-            label_enumerator = findEnumFromLabel(instruction_string);
+            switch (opcode_byte)
+            {
+            case JUMP_V:
+                label_enumerator = findEnumFromLabel(instruction_string);
 
-            // :( so much waste
-            machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
-            machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
-            machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
+                // :( so much waste
+                machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
+                machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
+                machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
+                break;
+            case BNE_V:
+
+                // register1
+                delimter_position = instruction_string.find(REGISTER_DELIMTER);
+                sub_str = instruction_string.substr(instruction_string.find(REGISTER_IDENTIFIER)+1, delimter_position-1);
+                register_byte = (uint8_t)std::stoi(sub_str.c_str());
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+                instruction_string = instruction_string.erase(0, delimter_position+1);
+
+                // register2
+                delimter_position = instruction_string.find(REGISTER_DELIMTER);
+                sub_str = instruction_string.substr(instruction_string.find(REGISTER_IDENTIFIER)+1, delimter_position-1);
+                register_byte = (uint8_t)std::stoi(sub_str.c_str());
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+                instruction_string = instruction_string.erase(0, delimter_position+1);
+
+                // label enum
+                label_enumerator = findEnumFromLabel(instruction_string);
+                machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
+                break;
+            
+            default:
+                break;
+            }
+
+
         }
 
         // IMMEDIATE-TYPE
         else
         {
-            if(opcode_byte == LOADF_V)
+            if(opcode_byte == LOADF_V || opcode_byte == LOADI_V)
             {
 
-                // Find the register number
-                delimter_position = instruction_string.find(REGISTER_IDENTIFIER);
-                register_delimter_position = instruction_string.find(REGISTER_DELIMTER);
-                sub_str = instruction_string.substr(delimter_position + 1, register_delimter_position - 1);
-                instruction_string.erase(0,  sizeof(REGISTER_IDENTIFIER) + sub_str.length() + sizeof(REGISTER_DELIMTER));
-                
-                // write the register location as machine code
-                register_byte = (uint8_t)std::stoi(sub_str.c_str());
-                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+                    // Find the register number
+                    delimter_position = instruction_string.find(REGISTER_IDENTIFIER);
+                    register_delimter_position = instruction_string.find(REGISTER_DELIMTER);
+                    sub_str = instruction_string.substr(delimter_position + 1, register_delimter_position - 1);
+                    instruction_string.erase(0,  sizeof(REGISTER_IDENTIFIER) + sub_str.length() + sizeof(REGISTER_DELIMTER));
+                    
+                    // write the register location as machine code
+                    register_byte = (uint8_t)std::stoi(sub_str.c_str());
+                    machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
 
-                // find the ')'
-                delimter_position = instruction_string.find(CLOSE_INSTRUCTION_DELIMITER);
-                sub_str = instruction_string.substr(0, delimter_position - 1);
+                    // find the ')'
+                    delimter_position = instruction_string.find(CLOSE_INSTRUCTION_DELIMITER);
+                    sub_str = instruction_string.substr(0, delimter_position - 1);
 
-                // pad the rest of the instruction with zeros
-                register_byte = 0;
-                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
-                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+                    // pad the rest of the instruction with zeros
+                    register_byte = 0;
+                    machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+                    machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
 
-                // write the float value as machine code
-                immediate_float = std::stof(sub_str.c_str());
-                machine_code_file.write(reinterpret_cast<const char*>(&immediate_float), sizeof(float));
 
+                    switch (opcode_byte)
+                    {
+                    case LOADF_V:
+                        // write the float value as machine code
+                        immediate_float = std::stof(sub_str.c_str());
+                        machine_code_file.write(reinterpret_cast<const char*>(&immediate_float), sizeof(float));
+                        break;
+                    
+                    case LOADI_V:
+                        // write the int value as machine code
+                        immediate_int = std::stoi(sub_str.c_str());
+                        machine_code_file.write(reinterpret_cast<const char*>(&immediate_int), sizeof(int));
+                        break;
+                    default:
+                        break;
+                    }
             }
+            
             else if(opcode_byte = CONSOLE_V)
             {
                 // Find the register number
@@ -336,6 +391,9 @@ uint8_t generateOpcode(std::string opcode)
     }
     else if(opcode == BEQ_S){
         return BEQ_V;
+    }
+    else if(opcode == BNE_S){
+        return BNE_V;
     }
     else if(opcode == STORE_S){
         return STORE_V;

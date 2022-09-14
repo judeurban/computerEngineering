@@ -13,7 +13,8 @@
 #define INSTRUCTION_SIZE 4             // bytes
 #define MAX_LABEL_SIZE 10               // character
 
-#define ISA_ASSEMBLY_FILE "main.asm"
+// #define ISA_ASSEMBLY_FILE "pi.asm"
+#define ISA_ASSEMBLY_FILE "for_loop.asm"
 #define MACHINE_CODE_FILE "machine_code.bin"
 
 // REGISTERS
@@ -25,7 +26,7 @@ std::vector<std::string> allStringInstructions;
 std::vector<uint32_t> instructions;
 uint32_t* programCounter;
 
-const char stripCharacters[] = {'\n', ' '};
+const char stripCharacters[] = {'\n', ' ', '\t'};
 const uint8_t stripCharactersLen = sizeof(stripCharacters)/sizeof(char);
 
 // LABELS
@@ -33,7 +34,7 @@ struct label
 {
     std::string text;
     uint8_t enumerator;
-    uint32_t* instruction;
+    uint32_t instruction;
 };
 
 // =========================================
@@ -77,22 +78,24 @@ struct label
 #define JUMP_V 0xf
 #define BEQ_S "beq"
 #define BEQ_V 0x10
+#define BNE_S "bne"
+#define BNE_V 0x11
 
 // == I-TYPE ==
 #define LOADI_S "loadi"
-#define LOADI_V 0x11
+#define LOADI_V 0x12
 #define LOADF_S "loadf"
-#define LOADF_V 0x12
+#define LOADF_V 0x13
 #define STORE_S "store"
-#define STORE_V 0x13
+#define STORE_V 0x14
 #define CONSOLE_S "console"
-#define CONSOLE_V 0x14
+#define CONSOLE_V 0x15
 
 // == L-TYPE ==
 #define L_S ":"
-#define L_V 0x15
+#define L_V 0x16
 
-// total operations: 0x16 = Od22
+// total operations: 0x17 = Od23
 // =========================================
 
 #endif
