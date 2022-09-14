@@ -3,7 +3,7 @@
 #include "generateMachineCode.hpp"
 #include "processMachineCode.hpp"
 
-using namespace std;
+// using namespace std;
 
 bool compile = true;
 

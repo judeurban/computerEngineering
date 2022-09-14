@@ -1,7 +1,7 @@
 #include <iostream>
 #include "main.h"
 
-using namespace std;
+// using namespace std;
 
 // float representation
 static float rd_f;
@@ -72,7 +72,7 @@ void DIVF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
     // operation
     if (r2_f == 0.0)
     {
-        cout << "you cannot divide by zero" << endl;
+        std::cout << "you cannot divide by zero" << std::endl;
         rd_f = -1.0;
     }
     else

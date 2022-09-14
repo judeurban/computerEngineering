@@ -1,23 +1,24 @@
 #include <iostream>
 #include "main.h"
 
+// functions
 void readMachineCode(void);
 void processMachineCode(void);
 bool zeroRegisterIsDestinationRegister(uint32_t*);
 bool checkRegisterIndex(uint8_t*);
-void printBinInstructions(void);
+uint8_t findIndexFromInstruction(uint32_t*);
 
-label* findLabelFromEnum(uint8_t);
-uint8_t findIndexFromInstruction(uint32_t);
-
-static std::vector<label*> machineLabels;
+// instructions
+static std::vector<label*> machineLabels;               // contains enumerated labels with a pointer to the instruction
+static std::vector<uint32_t*> instructions;             // contains pointers to instructions addresses in memory 
+uint32_t* programCounter;                               // the address of the next instruction!
 
 void readMachineCode()
 {
     // open the file
     std::ifstream instr_file(MACHINE_CODE_FILE);
     uint8_t bytes[4];
-    uint32_t instruction;
+    uint32_t* instruction_ptr;
     uint8_t byte;
 
     while (instr_file)
@@ -34,9 +35,11 @@ void readMachineCode()
             bytes[i] = byte;
         }
 
+        instruction_ptr = new uint32_t;
+
         // copy the four bytes into ONE instruction
-        memcpy(&instruction, &bytes[0], sizeof(bytes));
-        instructions.push_back(instruction);
+        memcpy(instruction_ptr, &bytes[0], sizeof(bytes));
+        instructions.push_back(instruction_ptr);
 
         // TODO: record any labels: here. Slide those into a buffer
 
@@ -44,38 +47,10 @@ void readMachineCode()
         {
             label* l = new label;
             l->enumerator = (uint8_t)bytes[1];
-            l->instruction = instruction;
+            l->instruction = instruction_ptr;
             machineLabels.push_back(l);
         }
     }
-
-    // decode each instruction (32 bits, 4 bytes)
-    // EXCEPT when a float is encoded
-
-    // have a FIFO buffer of six bytes or something. Some instructions may or may utilize all six bytes.
-
-    // pseudocode:
-
-    // opcode = bytes[0]
-    // if opcode is an R-type:
-        // for i in range(3):
-            // find the three registers
-        
-        // do the operation
-
-    // elif opcode is a J-Type:
-        // ?
-
-    // elif opcode is a I-Type:
-        // register = bytes[1]
-
-        // next FOUR bytes is the encoded float value
-        // do the operation}
-
-/**
- * @brief Checks to see if the passed register is the zero register, which you cannot write into.
-*/
-
 }
 
 void processMachineCode()
@@ -101,12 +76,12 @@ void processMachineCode()
 
     // start on the FIRST instruction, initialize the programCounter
     instruction_idx = 0;
-    programCounter = &instructions.at(instruction_idx);
+    programCounter = instructions.at(instruction_idx);
 
     while(programCounter != NULL)
     {
         // update the program counter!
-        programCounter = &instructions.at(instruction_idx);
+        programCounter = instructions.at(instruction_idx);
         instruction = *programCounter;
         instruction_idx += 1;
 
@@ -158,8 +133,8 @@ void processMachineCode()
             source_register2 = &allRegisters[bytes[3]];
 
             // ignore if they're tryna write into the zero register
-            // if(zeroRegisterIsDestinationRegister(destination_register) && opcode != CONSOLE_V) 
-            //     continue;
+            if(zeroRegisterIsDestinationRegister(destination_register) && opcode != CONSOLE_V) 
+                continue;
 
             // TODO: make remainder of function calls here
             switch (opcode)
@@ -224,8 +199,8 @@ void processMachineCode()
                 continue;
             }
 
-            // if(zeroRegisterIsDestinationRegister(destination_register))
-            //     return;
+            if(zeroRegisterIsDestinationRegister(destination_register))
+                return;
 
             if(opcode == LOADF_V || opcode == LOADI_V)
             {
@@ -240,49 +215,33 @@ bool zeroRegisterIsDestinationRegister(uint32_t* r1)
 {
     if (r1 == zero_register)
     {
-        cout << "cannot write into the zero register" << endl;
+        std::cout << "cannot write into the zero register" << std::endl;
         return true;
     }
 
     return false;
 }
 
+/* make sure register isn't out of bounds! */
 bool checkRegisterIndex(uint8_t* bytes)
 {
     if(bytes[1] > NUMBER_OF_REGISTERS-1 || bytes[2] > NUMBER_OF_REGISTERS-1 || bytes[3] > NUMBER_OF_REGISTERS-1)
     {
-        cout << "invalid index for one or more of the registers" << endl;
+        std::cout << "invalid index for one or more of the registers" << std::endl;
         return true;
     }
 
     return false;
 }
 
-// label* findLabelFromEnum(uint8_t label_enum)
-// {
-//     label l;
-//     for (std::vector<label*>::iterator it = machineLabels.begin() ; it != machineLabels.end(); ++it)
-//     {
-//         l = **it;
-//         if (l.enumerator == label_enum)
-//         {
-//             // return it;
-//             return &machineLabels.at(l.enumerator);
-//         }
-//     }
-
-//     return NULL;
-// }
-
-
-uint8_t findIndexFromInstruction(uint32_t instr)
+uint8_t findIndexFromInstruction(uint32_t* instr)
 {
     uint8_t iter = 0;
     uint32_t* instruction_ptr;
 
-    for (std::vector<uint32_t>::iterator it = instructions.begin() ; it != instructions.end(); ++it)
+    for (std::vector<uint32_t*>::iterator it = instructions.begin() ; it != instructions.end(); ++it)
     {
-        if(instructions.at(iter) == instr)
+        if(*it == instr)
         {
             return iter;
         }

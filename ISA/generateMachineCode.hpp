@@ -1,7 +1,7 @@
 #include <iostream>
 #include "main.h"
 
-using namespace std;
+// using namespace std;
 
 #define OPEN_INSTRUCTION_DELIMITER '('
 #define CLOSE_INSTRUCTION_DELIMITER ')'
@@ -10,16 +10,18 @@ using namespace std;
 
 // functions
 void readInstructions(void);
+void generateMachineCode(void);
 void printInstructions(void);
-bool isValidCharacter(char);
 void createRegisters(void);
 void destroyRegisters(void);
 void printRegisters(void);
-void generateMachineCode(void);
+bool isValidCharacter(char);
 uint8_t generateOpcode(std::string);
-
-static std::vector<label*> allLabels;
 uint8_t findEnumFromLabel(std::string);
+
+// instructions
+static std::vector<label*> allLabels;                       // pointers to "label" structure I defined in main.h. They contain an enumerated value and a string
+static std::vector<std::string> allStringInstructions;      // a vector of compressed instructions (still in string form)
 
 std::string stripInstruction(std::string &instruction)
 {
@@ -114,9 +116,9 @@ void printRegisters()
     uint32_t registerData;
     for (int i = 0 ; i < NUMBER_OF_REGISTERS ; i++)
     {
-        cout << "registerData for register " << i << " is ";
+        std::cout << "registerData for register " << i << " is ";
         registerData = allRegisters[i];
-        cout << registerData << endl;
+        std::cout << registerData << std::endl;
     }
 }
 
@@ -128,7 +130,7 @@ void printInstructions()
     for (std::vector<std::string>::iterator it = allStringInstructions.begin() ; it != allStringInstructions.end(); ++it)
     {
         instr_string = *it;
-        cout << "instruction " << i << " is >" << instr_string << "<" << endl;
+        std::cout << "instruction " << i << " is >" << instr_string << "<" << std::endl;
         i++;
     }
 }

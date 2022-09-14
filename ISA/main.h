@@ -21,11 +21,6 @@
 uint32_t allRegisters[NUMBER_OF_REGISTERS];
 uint32_t* zero_register = &allRegisters[0];
 
-// INSTRUCTIONS
-std::vector<std::string> allStringInstructions;
-std::vector<uint32_t> instructions;
-uint32_t* programCounter;
-
 const char stripCharacters[] = {'\n', ' ', '\t'};
 const uint8_t stripCharactersLen = sizeof(stripCharacters)/sizeof(char);
 
@@ -34,7 +29,7 @@ struct label
 {
     std::string text;
     uint8_t enumerator;
-    uint32_t instruction;
+    uint32_t* instruction;
 };
 
 // =========================================
