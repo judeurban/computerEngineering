@@ -1,27 +1,46 @@
-# instructions:
-1) load() - load from memory
-2) store() - store to memory
-3) add() - adding values from two registers
-4) sub() - subtracting values from two registers
-4) mul() - multiplying values from two registers
-5) div() - dividing a value by another value from two registers
-6) jmp() - jump to a statement
-7) beq() - branch to a statement given that two values are equal
+# Currently Valid Operations
 
-# loading words from memory
-`load()`
+## Memory Operations
 
-# storing words
-`store(r0, 0)`
+`loadf(r1, 3.14159)` -  Load a float into a register.
 
-# maths
+`loadi(r1, 54)` - Load an int into a register.
 
-`add(r0, r1, r2)` - add the values inside registers 1 and 2, storing the value into register 3
+## maths
 
-`sub(r0, r1, r2)` - subctract the values inside registers 1 and 2, storing the value into register 3
+`addi(r0, r1, r2)` - Add the integer values inside registers 1 and 2, storing the value into register 3.
 
-`mul(r1, r2, r3)` - multiply the values inside registers 1 and 2, storing the value into register 3
+`divf(r1, r2, r3)` - Divide the value in register 1 by the value in register 2, storing the value into register 3.
 
-`div(r1, r2, r3)` - divide the value in register 1 by the value in register 2, storing the value into register 3
+`console(r1)` - Print the value inside register 1.
 
-`console(r1)` - print the value inside register 1
+## Branching
+
+`my_label:` - Create a new label called "my_label". The software enumerates each label and assigns an instruction pointer to it.
+
+`jump(my_label)` - Jump to label "my_label". There is no conditional justification to the jump. It's just a jump.
+
+`bne(r1, r2, my_label)` - Jump to the label "my_label" if the data inside the two registers is identical.
+
+
+# Currently Inactive Operations (Not implemented)
+
+## maths
+
+addf
+subi
+subf
+muli
+mulf
+divi
+slt
+
+not
+and
+nand
+or
+nor
+xor
+
+## branching
+beq
