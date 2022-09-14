@@ -14,7 +14,10 @@ loadf(r1, 15.7079632679)         # circumference
 loadf(r2, 5.0)                   # diameter
 
 divf(r3, r1, r2)                 # calculate pi
-console(r3)                      # print the value in r3 to the console
+
+label:
+    console(r3)                      # print the value in r3 to the console
+    jump(label)
 
 # this outputs 0x40490fda which, converted to IEEE-754 
 # floating point algorithm is 3.14159

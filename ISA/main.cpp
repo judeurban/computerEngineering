@@ -17,8 +17,8 @@ bool compile = true;
 // vector labelVector;
 // while(readingFile)
     // if newinstruction has a ':'
-        // allInstructionsVector.push_back(newInstruction)
-        // labelVector.push_back(&allInstructionsVector[end])
+        // allStringInstructionsVector.push_back(newInstruction)
+        // labelVector.push_back(&allStringInstructionsVector[end])
 
         // probably 
 

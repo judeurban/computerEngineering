@@ -8,6 +8,7 @@ c_define = "#define"
 R_TYPE = 'R-TYPE'
 J_TYPE = 'J-TYPE'
 I_TYPE = 'I-TYPE'
+L_TYPE = 'L-TYPE'
 
 with open('defines.txt', 'r') as f:
     
@@ -21,7 +22,7 @@ with open('defines.txt', 'r') as f:
     for line in lines:
         line = line.strip()
 
-        if len(line) < 2:
+        if len(line) < 1:
             continue
         elif '#' in line:
             if R_TYPE in line:
@@ -30,6 +31,8 @@ with open('defines.txt', 'r') as f:
                 print(f'\n// == {J_TYPE} ==')
             elif I_TYPE in line:
                 print(f'\n// == {I_TYPE} ==')
+            elif L_TYPE in line:
+                print(f'\n// == {L_TYPE} ==')
 
             continue
 

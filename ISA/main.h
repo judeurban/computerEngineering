@@ -6,11 +6,12 @@
 #include <string>
 #include <vector>
 #include <cstring>
-#include "functions.hpp"
+#include "operations.hpp"
 
 #define NUMBER_OF_REGISTERS 8
 #define MAXIMUM_INSTRUCTIONS 10
 #define INSTRUCTION_SIZE 4             // bytes
+#define MAX_LABEL_SIZE 10               // character
 
 #define ISA_ASSEMBLY_FILE "main.asm"
 #define MACHINE_CODE_FILE "machine_code.bin"
@@ -20,12 +21,24 @@ uint32_t allRegisters[NUMBER_OF_REGISTERS];
 uint32_t* zero_register = &allRegisters[0];
 
 // INSTRUCTIONS
-std::vector<std::string> allInstructions;
-const char invalidCharacters[] = {'\n', ' '};
-const uint8_t invalidCharacterLen = sizeof(invalidCharacters)/sizeof(char);
+std::vector<std::string> allStringInstructions;
+std::vector<uint32_t> instructions;
+uint32_t* programCounter;
+
+const char stripCharacters[] = {'\n', ' '};
+const uint8_t stripCharactersLen = sizeof(stripCharacters)/sizeof(char);
+
+// LABELS
+struct label
+{
+    std::string text;
+    uint8_t enumerator;
+    uint32_t* instruction;
+};
 
 // =========================================
 // OPCODES
+
 
 // == R-TYPE ==
 #define ADDI_S "addi"
@@ -75,7 +88,11 @@ const uint8_t invalidCharacterLen = sizeof(invalidCharacters)/sizeof(char);
 #define CONSOLE_S "console"
 #define CONSOLE_V 0x14
 
-// total operations: 0x15 = Od21
+// == L-TYPE ==
+#define L_S ":"
+#define L_V 0x15
+
+// total operations: 0x16 = Od22
 // =========================================
 
 #endif

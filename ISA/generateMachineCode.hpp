@@ -18,6 +18,9 @@ void printRegisters(void);
 void generateMachineCode(void);
 uint8_t generateOpcode(std::string);
 
+static std::vector<label*> allLabels;
+uint8_t findEnumFromLabel(std::string);
+
 std::string stripInstruction(std::string &instruction)
 {
     std::string stripped_instruction;
@@ -37,9 +40,9 @@ std::string stripInstruction(std::string &instruction)
 
 bool isValidCharacter(char character)
 {
-    for(int i = 0 ; i < invalidCharacterLen; i++)
+    for(int i = 0 ; i < stripCharactersLen; i++)
     {
-        if (character == invalidCharacters[i])
+        if (character == stripCharacters[i])
         {
             return false;
         }
@@ -71,10 +74,10 @@ void readInstructions()
         // do not add any invalid characters (after the while loop above)
         if(character < 0) {continue;}
         
-        // new line, add this instruction to the list of allInstructions
+        // new line, add this instruction to the list of allStringInstructions
         if (instr_string.length() && character == '\n')
         {
-            allInstructions.push_back(stripInstruction(instr_string));
+            allStringInstructions.push_back(stripInstruction(instr_string));
             instr_string.erase();
         }
         // continue building the instruction string
@@ -87,7 +90,7 @@ void readInstructions()
     // load the last instruction (the while loop terminates before we can add it)
     if (instr_string.length())
     {
-        allInstructions.push_back(stripInstruction(instr_string));
+        allStringInstructions.push_back(stripInstruction(instr_string));
         instr_string.erase();
     }
 }
@@ -112,7 +115,7 @@ void printInstructions()
     std::string instr_string;
 
     int i = 0;
-    for (std::vector<std::string>::iterator it = allInstructions.begin() ; it != allInstructions.end(); ++it)
+    for (std::vector<std::string>::iterator it = allStringInstructions.begin() ; it != allStringInstructions.end(); ++it)
     {
         instr_string = *it;
         cout << "instruction " << i << " is >" << instr_string << "<" << endl;
@@ -132,6 +135,7 @@ void generateMachineCode()
 
     uint8_t opcode_byte;
     uint8_t register_byte;
+    uint8_t label_enumerator = 0;
     float immediate_float;
 
     if(!machine_code_file.is_open()) { return; }
@@ -139,10 +143,41 @@ void generateMachineCode()
     // TODO: left shift by 4, then AND with the register to create represent each with four Fbits?
     // NOTE: using BIG endian encoding
 
-    for (std::vector<std::string>::iterator it = allInstructions.begin() ; it != allInstructions.end(); ++it)
+    for (std::vector<std::string>::iterator it = allStringInstructions.begin() ; it != allStringInstructions.end(); ++it)
     {
         // find the instruction string
         instruction_string = *it;
+
+        // labels!
+        if(instruction_string.find(L_S) != std::string::npos)
+        {
+            // 1 byte for the opcode
+            // 1 byte for the enumerator
+            // 2 bytes are wasted...
+
+            sub_str = instruction_string.substr(0, instruction_string.size()-1);
+
+            // we will utilize register_byte to prevent creating a semi-useless variable
+
+            opcode_byte = L_V;
+            register_byte = label_enumerator;
+            label_enumerator += 1;
+
+            label* l = new label;
+            l->text = sub_str;
+            l->enumerator = (uint8_t)allLabels.size();
+            allLabels.push_back(l);
+
+            machine_code_file.write(reinterpret_cast<const char*>(&opcode_byte), sizeof(uint8_t));
+            machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+
+            // :(
+            register_byte = 0;
+            machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+            machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+
+            continue;
+        }
 
         // get the delimeter position of the first open parenthesis
         delimter_position = instruction_string.find(OPEN_INSTRUCTION_DELIMITER);
@@ -177,11 +212,18 @@ void generateMachineCode()
                 machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
             }
         }
+ 
         // JUMP-TYPE
         else if(opcode_byte < LOADI_V)
         {
-            // TODO
+            label_enumerator = findEnumFromLabel(instruction_string);
+
+            // :( so much waste
+            machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
+            machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
+            machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
         }
+
         // IMMEDIATE-TYPE
         else
         {
@@ -309,6 +351,21 @@ uint8_t generateOpcode(std::string opcode)
     // MEMORY, FLOATS
     else if(opcode == LOADF_S){
         return LOADF_V;
+    }
+
+    return -1;
+}
+
+uint8_t findEnumFromLabel(std::string label_text)
+{
+    label l;
+    for (std::vector<label*>::iterator it = allLabels.begin() ; it != allLabels.end(); ++it)
+    {
+        l = **it;
+        if (l.text == label_text)
+        {
+            return l.enumerator;
+        }
     }
 
     return -1;
