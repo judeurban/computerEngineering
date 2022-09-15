@@ -14,12 +14,14 @@ int main(int argc, const char *argv[])
         ISA_ASSEMBLY_FILE = file_arg;
         
         // read and generate instructions
-        readInstructions();
-        generateMachineCode();
+        if(readInstructions() || generateMachineCode())
+        {
+            return COMPILER_ERROR;
+        }
     }
 
     readMachineCode();
     processMachineCode();
 
-    return 0;
+    return COMPILER_SUCCESS;
 }

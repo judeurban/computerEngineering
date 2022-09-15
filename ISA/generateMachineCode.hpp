@@ -7,8 +7,8 @@
 #define REGISTER_DELIMTER ','
 
 // functions
-void readInstructions(void);
-void generateMachineCode(void);
+int readInstructions(void);
+int generateMachineCode(void);
 void printInstructions(void);
 void createRegisters(void);
 void destroyRegisters(void);
@@ -51,13 +51,13 @@ bool isValidCharacter(char character)
     return true;
 }
 
-void readInstructions()
+int readInstructions()
 {
     std::ifstream instr_file(ISA_ASSEMBLY_FILE);
     std::string instr_string;
     char character;
     
-    if (!instr_file.is_open()) {return;}
+    if (!instr_file.is_open()) {return COMPILER_ERROR;}
 
     while (instr_file)
     {
@@ -103,6 +103,7 @@ void readInstructions()
     }
 
     // printInstructions();
+    return 0;
 }
 
 /**
@@ -133,7 +134,7 @@ void printInstructions()
     }
 }
 
-void generateMachineCode()
+int generateMachineCode()
 {
     std::ofstream machine_code_file(MACHINE_CODE_FILE, std::ios::out | std::ios::binary);
     size_t delimter_position;
@@ -152,7 +153,7 @@ void generateMachineCode()
     if (!machine_code_file.is_open())
     {
         std::cout << "Could not open the machine code file" << std::endl;
-        return;
+        return COMPILER_ERROR;
     }
 
     // TODO: left shift by 4, then AND with the register to create represent each with four Fbits?
@@ -196,11 +197,16 @@ void generateMachineCode()
 
         // get the delimeter position of the first open parenthesis
         delimter_position = instruction_string.find(OPEN_INSTRUCTION_DELIMITER);
-        if(delimter_position == std::string::npos) { return; }
+        if(delimter_position == std::string::npos) { return COMPILER_ERROR; }
 
         // convert the opcode ascii representation into a single byte
         sub_str = instruction_string.substr(0, delimter_position);
-        opcode_byte = generateOpcode(sub_str);
+
+        if ((opcode_byte = generateOpcode(sub_str)) == (uint8_t)COMPILER_ERROR)
+        {
+            std::cout << "invalid instruction '" << sub_str << "'" << std:: endl;
+            return COMPILER_ERROR;
+        }
 
         // write the opcode to the file
         machine_code_file.write(reinterpret_cast<const char*>(&opcode_byte), sizeof(uint8_t));
@@ -234,7 +240,11 @@ void generateMachineCode()
             switch (opcode_byte)
             {
             case JUMP_V:
-                label_enumerator = findEnumFromLabel(instruction_string);
+                if((label_enumerator = findEnumFromLabel(instruction_string)) != COMPILER_SUCCESS)
+                {
+                    std::cout << "invalid label" << std::endl;
+                    return COMPILER_ERROR;
+                }
 
                 // :( so much waste
                 machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
@@ -258,7 +268,12 @@ void generateMachineCode()
                 instruction_string = instruction_string.erase(0, delimter_position+1);
 
                 // label enum
-                label_enumerator = findEnumFromLabel(instruction_string);
+                if((label_enumerator = findEnumFromLabel(instruction_string)) != COMPILER_SUCCESS)
+                {
+                    std::cout << "invalid label" << std::endl;
+                    return COMPILER_ERROR;
+                }
+
                 machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
                 break;
             
@@ -335,7 +350,7 @@ void generateMachineCode()
         }
     }
 
-    // TODO branch between different types of opcodes. (r-type, j-type, i-type) accordingly.
+    return COMPILER_SUCCESS;
 }
 
 uint8_t generateOpcode(std::string opcode)
@@ -415,7 +430,7 @@ uint8_t generateOpcode(std::string opcode)
         return LOADF_V;
     }
 
-    return -1;
+    return COMPILER_ERROR;
 }
 
 uint8_t findEnumFromLabel(std::string label_text)
@@ -430,5 +445,5 @@ uint8_t findEnumFromLabel(std::string label_text)
         }
     }
 
-    return -1;
+    return COMPILER_ERROR;
 }

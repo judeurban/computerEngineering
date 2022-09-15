@@ -192,6 +192,7 @@ void processMachineCode()
 
                     // reset the PC incremetor to the index associaed with a paritcular instr
                     instruction_idx = findIndexFromInstruction(machineLabels.at(jump_to_label_enum)->instruction);
+                    programCounter = instructions.at(instruction_idx);
                 }
                 
                 break;          

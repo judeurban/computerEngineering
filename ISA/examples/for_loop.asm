@@ -13,7 +13,7 @@
 # if iterator != r0, then branch to label
 # if iterator == 0, code will exit as normal
 
-loadi(r1, 5)       # maximum iterator limit
+loadi(r1, 5)        # maximum iterator limit
 loadi(r2, 1)        # iterator
 loadi(r3, 1)        # incremetor (++)
 loadi(r4, 0)        # running sum
