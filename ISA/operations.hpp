@@ -16,6 +16,7 @@ void DIVF(uint32_t*, uint32_t*, uint32_t*);
 int BNE(uint32_t*, uint32_t*);
 void CONSOLE(uint32_t*);
 
+//ADDF
 void ADDF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 {
     memcpy(&r1_f, r1, sizeof(float));
@@ -28,6 +29,7 @@ void ADDF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
     memcpy(r_destination, &rd_f, sizeof(float));
 }
 
+//ADDI
 void ADDI(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 {
     memcpy(&r1_i, r1, sizeof(int));
@@ -40,6 +42,7 @@ void ADDI(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
     memcpy(r_destination, &rd_i, sizeof(float));
 }
 
+//LOADF
 void LOADF(uint32_t* r_destination, uint32_t* instruction)
 {
     memcpy(r_destination, instruction, sizeof(instruction));
@@ -50,6 +53,7 @@ void LOADI(uint32_t* r_destination, uint32_t* instruction)
     memcpy(r_destination, instruction, sizeof(instruction));
 }
 
+//BNE
 int BNE(uint32_t* r1, uint32_t* r2)
 {
     // TRUE if they're not equal
@@ -62,6 +66,7 @@ int BNE(uint32_t* r1, uint32_t* r2)
     return 0;
 }
 
+//DIVF
 void DIVF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 {
     memcpy(&r1_f, r1, sizeof(float));
@@ -82,6 +87,122 @@ void DIVF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
     memcpy(r_destination, &rd_f, sizeof(float));
 }
 
+//SUBBI
+void SUBI(uint32_t* r_destination, uint32_t* r1, uint32_t* r2){
+  memcpy(&r1_i, r1, sizeof(int)):
+  memcpy(&r2_i, r2, sizeof(int)):
+  
+  //operation
+  rd_i = r1_i - r2_i;
+  
+  // memory write
+  memcpy(r_destination, &rd_i, sizeof(float));
+}
+
+//SUBBF
+void SUBF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2){
+  memcpy(&r1_f, r1, sizeof(float)):
+  memcpy(&r2_f, r2, sizeof(float)):
+  
+  //operation
+  rd_f = r1_f - r2_f;
+
+  // memory write
+  memcpy(r_destination, &rd_f, sizeof(float));
+}
+
+//MULI
+void SUBI(uint32_t* r_destination, uint32_t* r1, uint32_t* r2){
+  memcpy(&r1_i, r1, sizeof(int)):
+  memcpy(&r2_i, r2, sizeof(int)):
+  
+  //operation
+  rd_i = r1_i * r2_i;
+  
+  // memory write
+  memcpy(r_destination, &rd_i, sizeof(float));
+}
+
+//MULF
+void MULF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2){
+  memcpy(&r1_f, r1, sizeof(float)):
+  memcpy(&r2_f, r2, sizeof(float)):
+  
+  //operation
+  rd_f = r1_f * r2_f;
+  
+  // memory write
+  memcpy(r_destination, &rd_f, sizeof(float));
+}
+
+
+//NAND
+void NAND(uint32_t* r_destination, uint32_t* r1, uint32_t* r2){
+  memcpy(&r1_f, r1, sizeof(float)):
+  memcpy(&r2_f, r2, sizeof(float)):
+  
+  //operation
+  rd_f = !(r1_f&&r2_f);
+  
+  // memory write
+  memcpy(r_destination, &rd_f, sizeof(float));
+}
+
+//OR
+void OR(uint32_t* r_destination, uint32_t* r1, uint32_t* r2){
+  memcpy(&r1_i, r1, sizeof(int)):
+  memcpy(&r2_i, r2, sizeof(int)):
+  
+  //operation
+  rd_i = r1_i || r2_i;
+  
+  // memory write
+  memcpy(r_destination, &rd_i, sizeof(float));
+}
+
+//AND
+void AND(uint32_t* r_destination, uint32_t* r1, uint32_t* r2){
+  memcpy(&r1_i, r1, sizeof(int)):
+  memcpy(&r2_i, r2, sizeof(int)):
+  
+  //operation
+  rd_i = r1_i && r2_i;
+  
+  // memory write
+  memcpy(r_destination, &rd_i, sizeof(float));
+}
+
+//NOR
+void NOR(uint32_t* r_destination, uint32_t* r1, uint32_t* r2){
+  memcpy(&r1_f, r1, sizeof(float)):
+  memcpy(&r2_f, r2, sizeof(float)):
+  
+  //operation
+  rd_f = !(r1_f||r2_f);
+  
+  // memory write
+  memcpy(r_destination, &rd_f, sizeof(float));
+}
+
+//XOR
+void XOR(uint32_t* r_destination, uint32_t* r1, uint32_t* r2){
+  memcpy(&r1_f, r1, sizeof(float)):
+  memcpy(&r2_f, r2, sizeof(float)):
+  
+  //operation
+  rd_f = !(r1_f ^ r2_f);
+  
+  // memory write
+  memcpy(r_destination, &rd_f, sizeof(float));
+} // Needs testing
+
+//JUMP
+//BEQ
+//STORE
+//SLT 
+//NOT
+
+//CONSOLE
 void CONSOLE(uint32_t* registerToPrint)
 {
     printf("Register 0x%x contains the value 0x%x\n", registerToPrint, (uint32_t) *registerToPrint);
