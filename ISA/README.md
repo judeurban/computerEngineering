@@ -4,7 +4,7 @@
 
 1) `cd ISA` - go to the ISA directory
 2) `g++ main.cpp -o main` - compile into an executable
-3) `./main.exe pi.asm` - run the executable, specifying the file. **pi.asm** and **for-loop.asm** are provided. 
+3) `./main.exe examples/pi.asm` - run the executable, specifying the file. **pi.asm**, **for-loop.asm** and more are provided. 
 
 # Currently Valid Operations
 
