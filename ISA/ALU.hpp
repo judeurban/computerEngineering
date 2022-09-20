@@ -207,7 +207,6 @@ void AND(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
     
     //operation
     rd_i = r1_i & r2_i;
-    std::cout << rd_i << std::endl;
     
     // memory write
     memcpy(r_destination, &rd_i, sizeof(uint32_t));
