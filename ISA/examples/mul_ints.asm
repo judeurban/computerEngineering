@@ -1,0 +1,6 @@
+loadi(r1, 10)
+loadi(r2, 5)
+muli(r3, r1, r2)
+console(r1)
+console(r2)
+console(r3)

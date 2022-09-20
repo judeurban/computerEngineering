@@ -6,13 +6,13 @@
 #include <string>
 #include <vector>
 #include <cstring>
-#include "operations.hpp"
+#include "ALU.hpp"
 
 #define COMPILER_SUCCESS 0
 #define COMPILER_ERROR -1
 
-#define NUMBER_OF_REGISTERS 8
-#define INSTRUCTION_SIZE 4             // bytes
+#define NUMBER_OF_REGISTERS 16
+#define INSTRUCTION_SIZE 4              // bytes
 
 #define MACHINE_CODE_FILE "machine_code.bin"
 std::string ISA_ASSEMBLY_FILE;
@@ -90,7 +90,16 @@ struct label
 #define L_S ":"
 #define L_V 0x16
 
-// total operations: 0x17 = Od23
+// total operations: 0x16 = Od22
 // =========================================
+
+// =========================================
+// ARRAY OF FUNCTION POINTERS
+
+// =========================================
+// ARRAY OF FUNCTION POINTERS
+
+#define NUM_RTYPE_OPERATIONS 15
+void (*RTypeFunctionPtrs[NUM_RTYPE_OPERATIONS]) (uint32_t*, uint32_t*, uint32_t*);
 
 #endif

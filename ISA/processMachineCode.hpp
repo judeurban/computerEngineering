@@ -2,8 +2,10 @@
 #include "main.h"
 
 // functions
-void readMachineCode(void);
-void processMachineCode(void);
+void buildFunctionPointerArray(void);
+int readMachineCode(void);
+int processMachineCode(void);
+void processRType(uint8_t, uint32_t*, uint32_t*, uint32_t*);
 bool zeroRegisterIsDestinationRegister(uint32_t*);
 bool checkRegisterIndex(uint8_t*);
 uint8_t findIndexFromInstruction(uint32_t*);
@@ -13,7 +15,26 @@ static std::vector<label*> machineLabels;               // contains enumerated l
 static std::vector<uint32_t*> instructions;             // contains pointers to instructions addresses in memory 
 uint32_t* programCounter;                               // the address of the next instruction!
 
-void readMachineCode()
+void buildFunctionPointerArray()
+{
+  RTypeFunctionPtrs[ADDI_V] = ADDI; /* address of ADDI() */
+  RTypeFunctionPtrs[ADDF_V] = ADDF; /* address of ADDF() */
+  RTypeFunctionPtrs[SUBI_V] = SUBI; /* address of SUBI() */
+  RTypeFunctionPtrs[SUBF_V] = SUBF; /* address of SUBF() */
+  RTypeFunctionPtrs[MULI_V] = MULI; /* address of MULI() */
+  RTypeFunctionPtrs[MULF_V] = MULF; /* address of MULF() */
+  RTypeFunctionPtrs[DIVI_V] = DIVI; /* address of DIVI() */
+  RTypeFunctionPtrs[DIVF_V] = DIVF; /* address of DIVF() */
+//   RTypeFunctionPtrs[SLT_V] = SLT; /* address of SLT() */
+//   RTypeFunctionPtrs[NOT_V] = NOT; /* address of NOT() */
+  RTypeFunctionPtrs[AND_V] = AND; /* address of AND() */
+  RTypeFunctionPtrs[NAND_V] = NAND; /* address of NAND() */
+  RTypeFunctionPtrs[OR_V] = OR; /* address of OR() */
+  RTypeFunctionPtrs[NOR_V] = NOR; /* address of NOR() */
+  RTypeFunctionPtrs[XOR_V] = XOR; /* address of XOR() */
+}
+
+int readMachineCode()
 {
     // open the file
     std::ifstream machine_code_file(MACHINE_CODE_FILE);
@@ -26,7 +47,7 @@ void readMachineCode()
         std::cout << "\nERROR: There is no machine code file." << std::endl;
         std::cout << "You must first generate a machine code file by specificing it as an option when running main.exe" << std::endl;
         std::cout << "\nTry: ./main.exe pi.asm\n" << std::endl;
-        return;
+        return COMPILER_ERROR;
     }
 
     while (machine_code_file)
@@ -38,7 +59,7 @@ void readMachineCode()
 
             // end of file!
             if(byte == (uint8_t)-1)
-                return;
+                return COMPILER_SUCCESS;
 
             bytes[i] = byte;
         }
@@ -49,8 +70,6 @@ void readMachineCode()
         memcpy(instruction_ptr, &bytes[0], sizeof(bytes));
         instructions.push_back(instruction_ptr);
 
-        // TODO: record any labels: here. Slide those into a buffer
-
         if(bytes[0] == L_V)
         {
             label* l = new label;
@@ -59,9 +78,11 @@ void readMachineCode()
             machineLabels.push_back(l);
         }
     }
+
+    return COMPILER_SUCCESS;
 }
 
-void processMachineCode()
+int processMachineCode()
 {
     uint8_t opcode;
     uint16_t instruction_idx;
@@ -76,7 +97,6 @@ void processMachineCode()
     uint32_t* source_register2;
 
     uint32_t instruction;
-    // uint32_t* currentInstruction;
     bool immediateFLAG = false;
     uint8_t bytes[4];
 
@@ -85,7 +105,7 @@ void processMachineCode()
     // do not proceess empty an empty vector of instructions
     if (instructions.size() == 0)
     {
-        return;
+        return COMPILER_SUCCESS;
     }
 
     // start on the FIRST instruction, initialize the programCounter
@@ -138,7 +158,7 @@ void processMachineCode()
             // ignore if the register index is outta bounds
             if(checkRegisterIndex(&bytes[0]))
             {
-                return;
+                return COMPILER_ERROR;
             }
 
             // retrieve the register associate with that particular index
@@ -150,24 +170,7 @@ void processMachineCode()
             if(zeroRegisterIsDestinationRegister(destination_register) && opcode != CONSOLE_V) 
                 continue;
 
-            // TODO: make remainder of function calls here
-            switch (opcode)
-            {
-            case ADDF_V:
-                ADDF(destination_register, source_register1, source_register2);
-                break;
-
-            case ADDI_V:
-                ADDI(destination_register, source_register1, source_register2);
-                break;
-
-            case DIVF_V:
-                DIVF(destination_register, source_register1, source_register2);
-                break;
-            
-            default:
-                break;
-            }
+            processRType(opcode, destination_register, source_register1, source_register2);
         }
 
         // J-Type
@@ -175,31 +178,32 @@ void processMachineCode()
         {
             switch (opcode)
             {
-            case JUMP_V:
-                jump_to_label_enum = bytes[1];
-                // reset the PC incremetor to the index associaed with a paritcular instr
-                // programCounter = machineLabels.at(jump_to_label_enum)->instruction;
-                instruction_idx = findIndexFromInstruction(machineLabels.at(jump_to_label_enum)->instruction);
-                break;
-            case  BNE_V:
+                case JUMP_V:
 
-                source_register1 = &allRegisters[bytes[1]];
-                source_register2 = &allRegisters[bytes[2]];
-
-                if(BNE(source_register1, source_register2))
-                {
-                    jump_to_label_enum = bytes[3];
+                    jump_to_label_enum = bytes[1];
 
                     // reset the PC incremetor to the index associaed with a paritcular instr
                     instruction_idx = findIndexFromInstruction(machineLabels.at(jump_to_label_enum)->instruction);
-                    programCounter = instructions.at(instruction_idx);
-                }
-                
-                break;          
-            default:
-                break;
-            }
+                    break;
 
+                case  BNE_V:
+
+                    source_register1 = &allRegisters[bytes[1]];
+                    source_register2 = &allRegisters[bytes[2]];
+
+                    if(BNE(source_register1, source_register2))
+                    {
+                        jump_to_label_enum = bytes[3];
+
+                        // reset the PC incremetor to the index associaed with a paritcular instr
+                        instruction_idx = findIndexFromInstruction(machineLabels.at(jump_to_label_enum)->instruction);
+                        programCounter = instructions.at(instruction_idx);
+                    }
+                    
+                    break;          
+                default:
+                    break;
+            }
         }
 
         // I-Type
@@ -215,7 +219,7 @@ void processMachineCode()
             }
 
             if(zeroRegisterIsDestinationRegister(destination_register))
-                return;
+                return COMPILER_ERROR;
 
             if(opcode == LOADF_V || opcode == LOADI_V)
             {
@@ -224,6 +228,8 @@ void processMachineCode()
             }
         }
     }
+
+    return COMPILER_SUCCESS;
 }
 
 bool zeroRegisterIsDestinationRegister(uint32_t* r1)
@@ -265,4 +271,10 @@ uint8_t findIndexFromInstruction(uint32_t* instr)
     }
 
     return 0;
+}
+
+void processRType(uint8_t opcode, uint32_t* destination_register, uint32_t* source_register1, uint32_t* source_register2)
+{
+    // make the function call with the corresponding opcode!
+    (*RTypeFunctionPtrs[opcode])(destination_register, source_register1, source_register2);
 }

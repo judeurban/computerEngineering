@@ -156,9 +156,6 @@ int generateMachineCode()
         return COMPILER_ERROR;
     }
 
-    // TODO: left shift by 4, then AND with the register to create represent each with four Fbits?
-    // NOTE: using BIG endian encoding
-
     for (std::vector<std::string>::iterator it = allStringInstructions.begin() ; it != allStringInstructions.end(); ++it)
     {
         // find the instruction string
@@ -320,7 +317,7 @@ int generateMachineCode()
                     
                     case LOADI_V:
                         // write the int value as machine code
-                        immediate_int = std::stoi(sub_str.c_str());
+                        immediate_int = std::stoul(sub_str.c_str());
                         machine_code_file.write(reinterpret_cast<const char*>(&immediate_int), sizeof(int));
                         break;
                     default:
