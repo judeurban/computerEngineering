@@ -30,6 +30,9 @@
 
 `bne(r1, r2, my_label)` - Jump to the label "my_label" if the data inside the two registers is identical.
 
+# High Level Architecture
+
+![ISA Generate and Process Architecture](https://github.com/judeurban/computerEngineering/blob/main/ISA/highLevel.png)
 
 # Currently Inactive Operations (Not implemented)
 
