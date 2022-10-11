@@ -103,6 +103,7 @@ int readInstructions()
     }
 
     // printInstructions();
+    instr_file.close();
     return 0;
 }
 
@@ -133,7 +134,7 @@ void printInstructions()
         i++;
     }
 }
-
+    
 int generateMachineCode()
 {
     std::ofstream machine_code_file(MACHINE_CODE_FILE, std::ios::out | std::ios::binary);
@@ -229,6 +230,15 @@ int generateMachineCode()
                 register_byte = (uint8_t)std::stoi(sub_str.c_str());
                 machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
             }
+
+            // pad two more bytes of zero
+            if (opcode_byte == NOT_V)
+            {
+                // write the register location as machine code
+                register_byte = 0;
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+            }
         }
  
         // JUMP-TYPE
@@ -249,6 +259,7 @@ int generateMachineCode()
                 machine_code_file.write(reinterpret_cast<const char*>(&label_enumerator), sizeof(uint8_t));
                 break;
             case BNE_V:
+            case BEQ_V:
 
                 // register1
                 delimter_position = instruction_string.find(REGISTER_DELIMTER);
@@ -277,8 +288,6 @@ int generateMachineCode()
             default:
                 break;
             }
-
-
         }
 
         // IMMEDIATE-TYPE
@@ -286,43 +295,42 @@ int generateMachineCode()
         {
             if(opcode_byte == LOADF_V || opcode_byte == LOADI_V)
             {
+                // Find the register number
+                delimter_position = instruction_string.find(REGISTER_IDENTIFIER);
+                register_delimter_position = instruction_string.find(REGISTER_DELIMTER);
+                sub_str = instruction_string.substr(delimter_position + 1, register_delimter_position - 1);
+                instruction_string.erase(0,  sizeof(REGISTER_IDENTIFIER) + sub_str.length() + sizeof(REGISTER_DELIMTER));
+                
+                // write the register location as machine code
+                register_byte = (uint8_t)std::stoi(sub_str.c_str());
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
 
-                    // Find the register number
-                    delimter_position = instruction_string.find(REGISTER_IDENTIFIER);
-                    register_delimter_position = instruction_string.find(REGISTER_DELIMTER);
-                    sub_str = instruction_string.substr(delimter_position + 1, register_delimter_position - 1);
-                    instruction_string.erase(0,  sizeof(REGISTER_IDENTIFIER) + sub_str.length() + sizeof(REGISTER_DELIMTER));
-                    
-                    // write the register location as machine code
-                    register_byte = (uint8_t)std::stoi(sub_str.c_str());
-                    machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+                // find the ')'
+                delimter_position = instruction_string.find(CLOSE_INSTRUCTION_DELIMITER);
+                sub_str = instruction_string.substr(0, delimter_position - 1);
 
-                    // find the ')'
-                    delimter_position = instruction_string.find(CLOSE_INSTRUCTION_DELIMITER);
-                    sub_str = instruction_string.substr(0, delimter_position - 1);
-
-                    // pad the rest of the instruction with zeros
-                    register_byte = 0;
-                    machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
-                    machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+                // pad the rest of the instruction with zeros
+                register_byte = 0;
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
+                machine_code_file.write(reinterpret_cast<const char*>(&register_byte), sizeof(uint8_t));
 
 
-                    switch (opcode_byte)
-                    {
-                    case LOADF_V:
-                        // write the float value as machine code
-                        immediate_float = std::stof(sub_str.c_str());
-                        machine_code_file.write(reinterpret_cast<const char*>(&immediate_float), sizeof(float));
-                        break;
-                    
-                    case LOADI_V:
-                        // write the int value as machine code
-                        immediate_int = std::stoul(sub_str.c_str());
-                        machine_code_file.write(reinterpret_cast<const char*>(&immediate_int), sizeof(int));
-                        break;
-                    default:
-                        break;
-                    }
+                switch (opcode_byte)
+                {
+                case LOADF_V:
+                    // write the float value as machine code
+                    immediate_float = std::stof(sub_str.c_str());
+                    machine_code_file.write(reinterpret_cast<const char*>(&immediate_float), sizeof(float));
+                    break;
+                
+                case LOADI_V:
+                    // write the int value as machine code
+                    immediate_int = std::stoul(sub_str.c_str());
+                    machine_code_file.write(reinterpret_cast<const char*>(&immediate_int), sizeof(int));
+                    break;
+                default:
+                    break;
+                }
             }
             
             else if(opcode_byte = CONSOLE_V)
@@ -347,6 +355,7 @@ int generateMachineCode()
         }
     }
 
+    machine_code_file.close();
     return COMPILER_SUCCESS;
 }
 
@@ -399,8 +408,8 @@ uint8_t generateOpcode(std::string opcode)
     else if(opcode == XOR_S){
         return XOR_V;
     }
-    else if(opcode == SLT_S){
-        return SLT_V;
+    else if(opcode == XNOR_S){
+        return XNOR_V;
     }
     else if(opcode == JUMP_S){
         return JUMP_V;
@@ -410,9 +419,6 @@ uint8_t generateOpcode(std::string opcode)
     }
     else if(opcode == BNE_S){
         return BNE_V;
-    }
-    else if(opcode == STORE_S){
-        return STORE_V;
     }
     else if(opcode == CONSOLE_S){
         return CONSOLE_V;

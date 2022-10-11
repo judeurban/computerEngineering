@@ -25,13 +25,13 @@ void buildFunctionPointerArray()
   RTypeFunctionPtrs[MULF_V] = MULF; /* address of MULF() */
   RTypeFunctionPtrs[DIVI_V] = DIVI; /* address of DIVI() */
   RTypeFunctionPtrs[DIVF_V] = DIVF; /* address of DIVF() */
-//   RTypeFunctionPtrs[SLT_V] = SLT; /* address of SLT() */
 //   RTypeFunctionPtrs[NOT_V] = NOT; /* address of NOT() */
   RTypeFunctionPtrs[AND_V] = AND; /* address of AND() */
   RTypeFunctionPtrs[NAND_V] = NAND; /* address of NAND() */
   RTypeFunctionPtrs[OR_V] = OR; /* address of OR() */
   RTypeFunctionPtrs[NOR_V] = NOR; /* address of NOR() */
   RTypeFunctionPtrs[XOR_V] = XOR; /* address of XOR() */
+  RTypeFunctionPtrs[XNOR_V] = XNOR; /* address of XOR() */
 }
 
 int readMachineCode()
@@ -79,6 +79,7 @@ int readMachineCode()
         }
     }
 
+    machine_code_file.close();
     return COMPILER_SUCCESS;
 }
 
@@ -156,7 +157,7 @@ int processMachineCode()
         if (opcode < JUMP_V)
         {
             // ignore if the register index is outta bounds
-            if(checkRegisterIndex(&bytes[0]))
+            if(opcode < NOT_V && checkRegisterIndex(&bytes[0]))
             {
                 return COMPILER_ERROR;
             }
@@ -170,7 +171,15 @@ int processMachineCode()
             if(zeroRegisterIsDestinationRegister(destination_register) && opcode != CONSOLE_V) 
                 continue;
 
-            processRType(opcode, destination_register, source_register1, source_register2);
+            if (opcode == NOT_V)
+            {
+                NOT(destination_register);
+            }
+
+            else
+            {
+                processRType(opcode, destination_register, source_register1, source_register2);
+            }
         }
 
         // J-Type
@@ -186,12 +195,21 @@ int processMachineCode()
                     instruction_idx = findIndexFromInstruction(machineLabels.at(jump_to_label_enum)->instruction);
                     break;
 
-                case  BNE_V:
+                case BNE_V:
+                case BEQ_V:
 
                     source_register1 = &allRegisters[bytes[1]];
                     source_register2 = &allRegisters[bytes[2]];
 
-                    if(BNE(source_register1, source_register2))
+                    if(BNE_V && BNE(source_register1, source_register2))
+                    {
+                        jump_to_label_enum = bytes[3];
+
+                        // reset the PC incremetor to the index associaed with a paritcular instr
+                        instruction_idx = findIndexFromInstruction(machineLabels.at(jump_to_label_enum)->instruction);
+                        programCounter = instructions.at(instruction_idx);
+                    }
+                    if(BEQ_V && BEQ(source_register1, source_register2))
                     {
                         jump_to_label_enum = bytes[3];
 
@@ -200,7 +218,7 @@ int processMachineCode()
                         programCounter = instructions.at(instruction_idx);
                     }
                     
-                    break;          
+                    break;
                 default:
                     break;
             }

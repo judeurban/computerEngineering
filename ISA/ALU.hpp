@@ -11,10 +11,32 @@ static uint32_t rd_i;
 static uint32_t r1_i;
 static uint32_t r2_i;
 
+// immediate
+void LOADI(uint32_t*, uint32_t*);
 void LOADF(uint32_t*, uint32_t*);
-void DIVF(uint32_t*, uint32_t*, uint32_t*);
+
+// maths
 void ADDI(uint32_t*, uint32_t*, uint32_t*);
+void ADDF(uint32_t*, uint32_t*, uint32_t*);
+void SUBI(uint32_t*, uint32_t*, uint32_t*);
+void SUBF(uint32_t*, uint32_t*, uint32_t*);
+void MULI(uint32_t*, uint32_t*, uint32_t*);
+void MULF(uint32_t*, uint32_t*, uint32_t*);
+void DIVI(uint32_t*, uint32_t*, uint32_t*);
+void DIVF(uint32_t*, uint32_t*, uint32_t*);
+
+// logical
+void NOT(uint32_t*);
+void AND(uint32_t*, uint32_t*, uint32_t*);
+void NAND(uint32_t*, uint32_t*, uint32_t*);
+void OR(uint32_t*, uint32_t*, uint32_t*);
+void NOR(uint32_t*, uint32_t*, uint32_t*);
+void XOR(uint32_t*, uint32_t*, uint32_t*);
+void XNOR(uint32_t*, uint32_t*, uint32_t*);
+
+// conditional
 int BNE(uint32_t*, uint32_t*);
+int BEQ(uint32_t*, uint32_t*);
 void CONSOLE(uint32_t*);
 
 //ADDF
@@ -64,6 +86,18 @@ int BNE(uint32_t* r1, uint32_t* r2)
 {
     // TRUE if they're not equal
     if(*r1 != *r2)
+    {
+        return 1;
+    }
+
+    // False otherwise
+    return 0;
+}
+
+int BEQ(uint32_t* r1, uint32_t* r2)
+{
+    // TRUE if they're not equal
+    if(*r1 == *r2)
     {
         return 1;
     }
@@ -173,15 +207,11 @@ void MULF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 //NAND
 void NAND(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 {
-    memcpy(&r1_i, r1, sizeof(uint32_t));
-    memcpy(&r2_i, r2, sizeof(uint32_t));
-    
-    //operation
-    rd_f = !(r1_i & r2_i);
+    AND(&rd_i, r1, r2);
+    NOT(&rd_i);
     
     // memory write
-    memcpy(r_destination, &rd_f, sizeof(uint32_t));
-    
+    memcpy(r_destination, &rd_i, sizeof(uint32_t));
 }
 
 //OR
@@ -195,9 +225,7 @@ void OR(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
     
     // memory write
     memcpy(r_destination, &rd_i, sizeof(float));
-    
 }
-
 
 //AND
 void AND(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
@@ -216,31 +244,41 @@ void AND(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 //NOR
 void NOR(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 {
-  memcpy(&r1_i, r1, sizeof(uint32_t));
-  memcpy(&r2_i, r2, sizeof(uint32_t));
-  
-  //operation
-  rd_f = !(r1_i|r2_i);
-  
-  // memory write
-  memcpy(r_destination, &rd_i, sizeof(uint32_t));
-  
+    OR(&rd_i, r1, r2);
+    NOT(&rd_i);
+    
+    // memory write
+    memcpy(r_destination, &rd_i, sizeof(uint32_t));
 }
 
 //XOR
 void XOR(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 {
-  memcpy(&r1_f, r1, sizeof(uint32_t));
-  memcpy(&r2_f, r2, sizeof(uint32_t));
+  memcpy(&r1_i, r1, sizeof(uint32_t));
+  memcpy(&r2_i, r2, sizeof(uint32_t));
   
   //operation
-  // rd_f = !(r1_f ^ r2_f);
+  rd_i = (r1_i ^ r2_i);
   
   // memory write
-  memcpy(r_destination, &rd_f, sizeof(uint32_t));
-  
+  memcpy(r_destination, &rd_i, sizeof(uint32_t));
+}
 
-} // Needs testing
+void XNOR(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
+{
+    XOR(&rd_i, r1, r2);
+    NOT(&rd_i);
+    
+    // memory write
+    memcpy(r_destination, &rd_i, sizeof(uint32_t));
+}
+
+void NOT(uint32_t* r_destination)
+{
+    memcpy(&r1_i, r_destination, sizeof(uint32_t));
+    r1_i = ~r1_i;
+    memcpy(r_destination, &r1_i, sizeof(uint32_t));
+}
 
 //JUMP
 //BEQ
@@ -252,5 +290,4 @@ void XOR(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 void CONSOLE(uint32_t* registerToPrint)
 {
     printf("Register 0x%x contains the value 0x%x\n", registerToPrint, (uint32_t) *registerToPrint);
-    
 }

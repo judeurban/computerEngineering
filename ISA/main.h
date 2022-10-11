@@ -53,20 +53,20 @@ struct label
 #define DIVI_V 0x6
 #define DIVF_S "divf"
 #define DIVF_V 0x7
-#define SLT_S "slt"
-#define SLT_V 0x8
 #define NOT_S "not"
-#define NOT_V 0x9
+#define NOT_V 0x8
 #define AND_S "and"
-#define AND_V 0xa
+#define AND_V 0x9
 #define NAND_S "nand"
-#define NAND_V 0xb
+#define NAND_V 0xa
 #define OR_S "or"
-#define OR_V 0xc
+#define OR_V 0xb
 #define NOR_S "nor"
-#define NOR_V 0xd
+#define NOR_V 0xc
 #define XOR_S "xor"
-#define XOR_V 0xe
+#define XOR_V 0xd
+#define XNOR_S "xnor"
+#define XNOR_V 0xe
 
 // == J-TYPE ==
 #define JUMP_S "jump"
@@ -81,18 +81,14 @@ struct label
 #define LOADI_V 0x12
 #define LOADF_S "loadf"
 #define LOADF_V 0x13
-#define STORE_S "store"
-#define STORE_V 0x14
 #define CONSOLE_S "console"
-#define CONSOLE_V 0x15
+#define CONSOLE_V 0x14
 
 // == L-TYPE ==
 #define L_S ":"
-#define L_V 0x16
+#define L_V 0x15
 
 // total operations: 0x16 = Od22
-// =========================================
-
 // =========================================
 // ARRAY OF FUNCTION POINTERS
 
