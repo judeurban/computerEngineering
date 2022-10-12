@@ -1,0 +1,57 @@
+# INSTRUCTION DEFINITIONS
+
+# ==============
+# R-TYPE
+# ==============
+
+# maths
+addi
+addf
+subi
+subf
+muli
+mulf
+divi
+divf
+
+# ==============
+# logical
+# ==============
+
+not
+and
+nand
+or
+nor
+xor
+xnor
+
+# ==============
+# J-TYPE
+# ==============
+
+# branching
+jump
+beq
+bne
+
+# ==============
+# I-TYPE
+# ==============
+
+# loading
+loadi
+loadf
+
+# storing
+# store
+
+# printing to console
+console
+
+# ==============
+# L-TYPE
+# ==============
+
+# labels (to jump to)
+:

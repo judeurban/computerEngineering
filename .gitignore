@@ -16,7 +16,7 @@ build/
 *.txt
 
 # except for this one
-!buildingC/defines.txt
+!ISA/buildingC/defines.txt
 
 *.ilk
 *.obj
