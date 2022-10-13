@@ -157,6 +157,18 @@ int generateMachineCode()
         return COMPILER_ERROR;
     }
 
+    if (allStringInstructions.at(0) == "0x")
+    {
+        hexPrintOption = 1;
+        allStringInstructions.erase(allStringInstructions.begin());
+    }
+    else if(allStringInstructions.at(0) == "0b")
+    {
+        hexPrintOption = 0;
+        allStringInstructions.erase(allStringInstructions.begin());
+    }
+
+    // iterate through the list of instrucitons
     for (std::vector<std::string>::iterator it = allStringInstructions.begin() ; it != allStringInstructions.end(); ++it)
     {
         // find the instruction string

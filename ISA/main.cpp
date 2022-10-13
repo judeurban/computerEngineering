@@ -5,7 +5,6 @@
 
 int main(int argc, const char *argv[])
 {
-
     buildFunctionPointerArray();
 
     if(argc > 1)
@@ -23,9 +22,6 @@ int main(int argc, const char *argv[])
 
     readMachineCode();
     processMachineCode();
-
-    void (*fun_ptr[NUM_RTYPE_OPERATIONS])(uint32_t* rd, uint32_t* r1, uint32_t* r2);
-    fun_ptr[0] = ADDI;
 
     return COMPILER_SUCCESS;
 }

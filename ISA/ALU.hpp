@@ -11,6 +11,8 @@ static uint32_t rd_i;
 static uint32_t r1_i;
 static uint32_t r2_i;
 
+uint8_t hexPrintOption = 1;
+
 // immediate
 void LOADI(uint32_t*, uint32_t*);
 void LOADF(uint32_t*, uint32_t*);
@@ -38,6 +40,7 @@ void XNOR(uint32_t*, uint32_t*, uint32_t*);
 int BNE(uint32_t*, uint32_t*);
 int BEQ(uint32_t*, uint32_t*);
 void CONSOLE(uint32_t*);
+void bin(unsigned);
 
 //ADDF
 void ADDF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
@@ -289,5 +292,13 @@ void NOT(uint32_t* r_destination)
 //CONSOLE
 void CONSOLE(uint32_t* registerToPrint)
 {
-    printf("Register 0x%x contains the value 0x%x\n", registerToPrint, (uint32_t) *registerToPrint);
+    if(hexPrintOption)
+    {
+        std::cout << "Register 0x" << registerToPrint << " contains the value 0x" << std::hex << (uint32_t)*registerToPrint << std::endl;
+    }
+    else
+    {
+        std::bitset<32> bits(*registerToPrint);
+        std::cout << "Register 0x" << registerToPrint << " contains the value 0b" << bits << std::endl;
+    }
 }
