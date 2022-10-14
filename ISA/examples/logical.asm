@@ -1,29 +1,13 @@
 # 0xFFFFFFFF = 0d4294967295
 
-# generate random bytes in python:
-# int.from_bytes(random.randbytes(n), "little")
+# specify binary print option
+0b
 
-# with this, I generated:
-
-# 0xe3f52dc3 = 11100011 11110101 00101101 11000011 = 0d3824496067
-# 0xc4a204c3 = 11000100 10100010 00000100 11000011 = 0d3298952387
-
-loadi(r1, 3824496067)
-loadi(r2, 3298952387)
-and(r3, r1, r2)
-console(r3)
-
-# result is 0xc0a004c3 = 11000000 10100000 00000100 11000011
-
-#    11100011 11110101 00101101 11000011
-# &  11000100 10100010 00000100 11000011
-# 
-# =  11000000 10100000 00000100 11000011
-
-# not
-loadi(r1, 0)
-loadi(r2, 0)
-not(r1)
+loadf(r1, 3.14159)
 console(r1)
+
+loadf(r2, 2.7182)
+console(r2)
+
 xnor(r3, r1, r2)
 console(r3)

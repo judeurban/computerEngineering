@@ -1,5 +1,7 @@
-# code for slope, intercept!
-# y = mx + b
+# code for slope and intercept... y = mx + b
+
+# specify hex print option
+0x
 
 # slope_m  = (yfinal - yinit) / (xfinal - xinit)
 

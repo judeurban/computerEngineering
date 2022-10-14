@@ -1,5 +1,8 @@
 # code for calculating pi!
 
+# specify hex print option
+0x
+
 # pseudocode to calculate the ratio of pi:
 # diameter = 5.0
 # circumference = 15.7079632679

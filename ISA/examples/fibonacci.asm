@@ -1,5 +1,8 @@
 # fibonacci!
 
+# specify hex print option
+0x
+
 loadi(r1, 10)    # r1 contains the maximum iterator
 loadi(r2, 0)     # r2 contains F-2
 loadi(r3, 1)     # r3 contains F-1

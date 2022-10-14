@@ -61,14 +61,11 @@ void ADDI(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
     memcpy(&r1_i, r1, sizeof(int));
     memcpy(&r2_i, r2, sizeof(int));
     
-    std::cout << "wow" << std::endl;
-
     // operation
     rd_i =  r1_i + r2_i;
 
     // memory write
     memcpy(r_destination, &rd_i, sizeof(int));
-    
 }
 
 //LOADF
@@ -81,7 +78,6 @@ void LOADF(uint32_t* r_destination, uint32_t* instruction)
 void LOADI(uint32_t* r_destination, uint32_t* instruction)
 {
     memcpy(r_destination, instruction, sizeof(uint32_t));
-    
 }
 
 //BNE
@@ -162,7 +158,6 @@ void SUBI(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 
     // memory write
     memcpy(r_destination, &rd_i, sizeof(float));
-    
 }
 
 //SUBBF
@@ -176,7 +171,6 @@ void SUBF(uint32_t* r_destination, uint32_t* r1, uint32_t* r2)
 
     // memory write
     memcpy(r_destination, &rd_f, sizeof(float));
-    
 }
 
 //MULI

@@ -201,7 +201,7 @@ int processMachineCode()
                     source_register1 = &allRegisters[bytes[1]];
                     source_register2 = &allRegisters[bytes[2]];
 
-                    if(BNE_V && BNE(source_register1, source_register2))
+                    if((opcode == BNE_V) && BNE(source_register1, source_register2))
                     {
                         jump_to_label_enum = bytes[3];
 
@@ -209,7 +209,7 @@ int processMachineCode()
                         instruction_idx = findIndexFromInstruction(machineLabels.at(jump_to_label_enum)->instruction);
                         programCounter = instructions.at(instruction_idx);
                     }
-                    if(BEQ_V && BEQ(source_register1, source_register2))
+                    else if((opcode == BEQ_V) && BEQ(source_register1, source_register2))
                     {
                         jump_to_label_enum = bytes[3];
 

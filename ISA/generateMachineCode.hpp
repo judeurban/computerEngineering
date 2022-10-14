@@ -261,6 +261,7 @@ int generateMachineCode()
             case JUMP_V:
                 if((label_enumerator = findEnumFromLabel(instruction_string)) != COMPILER_SUCCESS)
                 {
+                    std::cout << "vector size is " << std::to_string(allLabels.size()) << std::endl;
                     std::cout << "invalid label" << std::endl;
                     return COMPILER_ERROR;
                 }
@@ -288,7 +289,7 @@ int generateMachineCode()
                 instruction_string = instruction_string.erase(0, delimter_position+1);
 
                 // label enum
-                if((label_enumerator = findEnumFromLabel(instruction_string)) != COMPILER_SUCCESS)
+                if((label_enumerator = findEnumFromLabel(instruction_string)) == COMPILER_ERROR)
                 {
                     std::cout << "invalid label" << std::endl;
                     return COMPILER_ERROR;
