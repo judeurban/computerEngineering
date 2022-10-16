@@ -62,30 +62,40 @@ When running scripts that use floats, I would suggest using this online [Hex-Flo
 ## Options
 
 `0x` - Print hexadecimal when using the `console(rX)` function.
+
 `0b` - Print the 32 bit binary when using the `console(rX)` function.
 
 
 ## Memory
 
 `loadf(r1, 3.14159)` -  Load a float into register 1.
+
 `loadi(r1, 54)` - Load an integer into register 1.
 
 ## Mathematics 
 
 `addi(r3, r1, r2)` -  Performs integer addition operation using registers 1 and 2 and stores the value in register 3.
+
 `divf(r1, r2, r3)` -  Performs floating point division operation using registers 2 and 3 and stores the value in register 3.
+
 `console(r1)` - Print the value inside register 1. Binary or hex will be printed depending on if you specified `0x` or `0b` as the first command.
 
 ## Boolean Logic
 
 `or(r1, r2, r3)` - Perform a OR operation using the values inside registers 2 and 3, storing it register 1.
+
 `and(r1, r2, r3)` - Perform a AND operation using the values inside registers 2 and 3, storing it register 1.
+
 `xor(r1, r2, r3)` - Perform a XOR operation using the values inside registers 2 and 3, storing it register 1.
+
 `not(r1)` - Perform a NOT operation on the value inside register r1. 
 
 ## Branching
 
 `my_label:` - Create a new label called "my_label". The software enumerates each label and assigns an instruction pointer to it.
+
 `jump(my_label)` - Unconditionally jump to label "my_label". There is no conditional justification to the jump. It's just a jump.
+
 `beq(r1, r2, my_label)` - Jump to the label "my_label" if the data inside the two registers are identical.
+
 `bne(r1, r2, my_label)` - Jump to the label "my_label" if the data inside the two registers are not identical.
