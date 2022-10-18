@@ -14,7 +14,7 @@
 #define NUMBER_OF_REGISTERS 16
 #define INSTRUCTION_SIZE 4              // bytes
 
-#define DEBUG_MODE 1                    // toggle to disable command argument specification and manually enter *.asm 
+#define DEBUG_MODE 0                    // toggle to disable command argument specification and manually enter *.asm 
 #define DEBUG_FILE "examples/for_loop.asm"
 
 #define MACHINE_CODE_FILE "machine_code.bin"
