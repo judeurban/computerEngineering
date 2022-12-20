@@ -1,4 +1,4 @@
-0b
+0x
 
 my_label:
     console(r0)
